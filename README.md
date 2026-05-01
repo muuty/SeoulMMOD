@@ -20,15 +20,12 @@ with aligned administrative metadata and contextual data.
 | `avg_dist_m` | Average travel distance in meters. | Nonnegative real number |
 | `avg_time_min` | Average travel time in minutes. | Nonnegative real number |
 
-The mode order used in the benchmark is `metro_bus`, `local_bus`, `subway`,
-`walk`, `car`, and `other`.
-
 ## Structure
 
 ```text
 baselines/       BasicTS baseline configs and model code
 basicts/         BasicTS framework code used in the benchmark
-datasets/        dataset placeholder and data notes
+datasets/        downloaded data and generated BasicTS datasets
 experiments/     training and evaluation scripts
 od_baselines/    MPGCN, ODCRN, and ODMixer source code
 scripts/         data builders and OD baseline runner
@@ -42,11 +39,14 @@ pip install -r requirements.txt
 
 ## Data
 
-To build BasicTS datasets from released parquet files:
+Download the released dataset from Kaggle and place its contents under
+`datasets/`.
+
+To build BasicTS datasets from the released parquet files:
 
 ```bash
 python scripts/build_basicts_dataset.py \
-  --input-dir raw \
+  --input-dir datasets/raw \
   --output-dir datasets \
   --level district \
   --years 2024
