@@ -50,7 +50,7 @@ def _build_poi_pair_features(poi_features_path: str, dataset_name: str,
     df = pd.read_csv(poi_features_path)
     code_col = 'district_cd'
     if code_col not in df.columns:
-        raise ValueError(f'district features file missing district_cd column: {poi_features_path}')
+        raise ValueError(f'district POI file missing district_cd column: {poi_features_path}')
     df[code_col] = df[code_col].astype(int)
     poi_by_district = {row[code_col]: row[poi_categories].to_numpy(dtype=np.float32)
                        for _, row in df.iterrows()}

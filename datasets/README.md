@@ -13,7 +13,7 @@ datasets/
     data.dat
     desc.json
   calendar.csv
-  district_features.csv
+  district_poi.csv
   district_metadata.csv
   rainfall/
     seoul_rain_hourly_2024.csv

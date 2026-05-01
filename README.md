@@ -74,7 +74,7 @@ python scripts/build_district_rain_dataset.py --year 2024
 ```
 
 These scripts use optional files such as `calendar.csv`,
-`district_features.csv`, `district_metadata.csv`, and rainfall CSVs under
+`district_poi.csv`, `district_metadata.csv`, and rainfall CSVs under
 `datasets/`.
 
 ## Citation

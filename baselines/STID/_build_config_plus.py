@@ -23,7 +23,7 @@ DISTRICT_POI_CATEGORIES = [
 ]
 DEFAULT_POI_PATH = os.environ.get(
     'SEOULMMOD_POI_PATH',
-    os.path.join('datasets', 'district_features.csv'),
+    os.path.join('datasets', 'district_poi.csv'),
 )
 
 
