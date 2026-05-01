@@ -17,7 +17,7 @@ from .arch import STAEformer
 # Predict all 6 modes jointly; use tod/dow as temporal embeddings.
 DATA_NAME = 'SeoulMMOD_District_2024'
 regular_settings = get_regular_settings(DATA_NAME)
-INPUT_LEN = 12   # override for short-horizon benchmark
+INPUT_LEN = 12
 OUTPUT_LEN = 12
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 

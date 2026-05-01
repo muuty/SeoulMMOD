@@ -17,7 +17,7 @@ from .arch import SOFTS
 ############################## Hot Parameters ##############################
 DATA_NAME = 'SeoulMMOD_Subdistrict_2024'
 regular_settings = get_regular_settings(DATA_NAME)
-INPUT_LEN = 12  # override for horizon=12 benchmark
+INPUT_LEN = 12
 OUTPUT_LEN = 12
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
@@ -46,7 +46,7 @@ NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'SOFTS on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates)'
+CFG.DESCRIPTION = 'SOFTS on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates, h=12)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

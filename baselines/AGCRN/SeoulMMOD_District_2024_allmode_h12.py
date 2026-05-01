@@ -18,7 +18,7 @@ from .arch import AGCRN
 # AGCRN does not use tod/dow embeddings, so we only forward the 6 flow channels.
 DATA_NAME = 'SeoulMMOD_District_2024'
 regular_settings = get_regular_settings(DATA_NAME)
-INPUT_LEN = 12   # override for short-horizon benchmark
+INPUT_LEN = 12
 OUTPUT_LEN = 12
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 

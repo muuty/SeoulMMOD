@@ -43,7 +43,7 @@ NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'STID on SeoulMMOD_District_2024 all-mode (input_dim=6, output_dim=6, tod+dow)'
+CFG.DESCRIPTION = 'STID on SeoulMMOD_District_2024 all-mode (input_dim=6, output_dim=6, tod+dow, h=12)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

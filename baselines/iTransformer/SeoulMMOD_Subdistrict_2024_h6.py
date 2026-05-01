@@ -18,7 +18,7 @@ from .arch import iTransformer
 # Dataset & Metrics configuration
 DATA_NAME = 'SeoulMMOD_Subdistrict_2024'
 regular_settings = get_regular_settings(DATA_NAME)
-INPUT_LEN = 6  # override for horizon=6 benchmark
+INPUT_LEN = 6
 OUTPUT_LEN = 6
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
@@ -46,7 +46,7 @@ NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates)'
+CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates, h=6)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

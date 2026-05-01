@@ -46,7 +46,7 @@ NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'SOFTS on SeoulMMOD_District_2024 (district-scale, per-OD-pair, 6 interacting modes as variates, all 625 pairs)'
+CFG.DESCRIPTION = 'SOFTS on SeoulMMOD_District_2024 (district-scale, per-OD-pair, 6 interacting modes as variates, all 625 pairs, h=6)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
