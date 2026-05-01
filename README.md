@@ -5,12 +5,7 @@ contains hourly multimodal origin-destination flows within Seoul from 2023 to
 2025. It covers six urban transport modes at district and subdistrict scales,
 with aligned administrative metadata and contextual data.
 
-Data, checkpoints, and logs are not included in this repository.
-
 ![Annual OD outflow in SeoulMMOD](assets/figure_1.png)
-
-Figure 1. Annual OD outflow in SeoulMMOD from the same Seoul origin at two
-spatial granularities.
 
 We also provide administrative metadata and contextual files for the released
 dataset.
