@@ -7,25 +7,6 @@ with aligned administrative metadata and contextual data.
 
 ![Annual OD outflow in SeoulMMOD](assets/figure_1.png)
 
-We also provide administrative metadata and contextual files for the released
-dataset.
-
-| File | Description |
-|---|---|
-| `raw/od_flow_2023.parquet` | Hourly multimodal OD flow records for 2023. |
-| `raw/od_flow_2024.parquet` | Hourly multimodal OD flow records for 2024. |
-| `raw/od_flow_2025.parquet` | Hourly multimodal OD flow records for 2025. |
-| `district_metadata.csv` | District code, name, and representative coordinates. |
-| `subdistrict_metadata.csv` | Subdistrict code, name, parent district code, and representative coordinates. |
-| `district_boundaries.geojson` | District administrative boundary geometries. |
-| `subdistrict_boundaries.geojson` | Subdistrict administrative boundary geometries. |
-| `calendar.csv` | Weekend and holiday indicators. |
-| `district_poi.csv` | District-level POI category counts based on 2025 data. |
-| `subdistrict_poi.csv` | Subdistrict-level POI category counts based on 2025 data. |
-| `rainfall/seoul_rain_hourly_2023.csv` | Hourly district rainfall for 2023. |
-| `rainfall/seoul_rain_hourly_2024.csv` | Hourly district rainfall for 2024. |
-| `rainfall/seoul_rain_hourly_2025.csv` | Hourly district rainfall for 2025. |
-
 ## OD Flow Schema
 
 | Attribute | Description | Values |
