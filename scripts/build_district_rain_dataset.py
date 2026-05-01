@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[1]
 TRAIN_RATIO = 0.7
 STEPS_PER_DAY = 24
 

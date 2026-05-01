@@ -26,7 +26,7 @@ pip install -r requirements.txt
 To build BasicTS datasets from released parquet files:
 
 ```bash
-python scripts/data_preparation/build_basicts_dataset.py \
+python scripts/build_basicts_dataset.py \
   --input-dir raw/parquet \
   --output-dir datasets \
   --level district \
@@ -69,8 +69,8 @@ python scripts/run_od_native.py \
 ## Context
 
 ```bash
-python scripts/data_preparation/SeoulMMOD_District_ctx/build_dataset.py --year 2024
-python scripts/data_preparation/SeoulMMOD_District_rain/build_dataset.py --year 2024
+python scripts/build_district_context_dataset.py --year 2024
+python scripts/build_district_rain_dataset.py --year 2024
 ```
 
 These scripts use optional files such as `calendar.csv`,

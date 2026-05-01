@@ -28,10 +28,10 @@ If processed parquet files are available, build the base datasets from the
 repository root with:
 
 ```bash
-python scripts/data_preparation/build_basicts_dataset.py \
+python scripts/build_basicts_dataset.py \
   --input-dir raw/parquet --output-dir datasets --level district --years 2024
 
-python scripts/data_preparation/build_basicts_dataset.py \
+python scripts/build_basicts_dataset.py \
   --input-dir raw/parquet --output-dir datasets --level subdistrict --years 2024
 ```
 

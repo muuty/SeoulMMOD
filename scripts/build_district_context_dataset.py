@@ -22,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[1]
 HOLIDAY_STATES = 3  # 0=workday, 1=weekend, 2=holiday
 
 
