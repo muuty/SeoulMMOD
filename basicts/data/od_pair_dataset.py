@@ -46,8 +46,8 @@ class ODPairDataset(BaseDataset):
             overlap: Whether splits can overlap.
             node_sample_size: If >0, randomly sample this many OD pairs per epoch
                               (for faster training). 0 = use all pairs.
-            mode_index: If set (int 0..n_modes-1), return only this single mode per
-                        sample (CI mode-separate training). Overrides n_modes to 1
+            mode_index: If set (int 0..n_modes-1), return only this single
+                        mode per sample. Overrides n_modes to 1.
                         in output shape.
         """
         assert mode in ['train', 'valid', 'test']
@@ -124,7 +124,7 @@ class ODPairDataset(BaseDataset):
 
         # Extract [input_len + output_len, n_modes_out] for this OD pair
         if self.mode_index is not None:
-            # CI mode-separate: single mode per sample
+            # Optional single-mode view.
             seq = self.data[t:t + self.input_len + self.output_len, pair_idx,
                             self.mode_index:self.mode_index + 1]
         else:
