@@ -10,8 +10,6 @@ datasets/*
 raw/
 checkpoints/
 logs/
-tables/
-tables_data/*
 benchmark_runs/
 runs/
 
