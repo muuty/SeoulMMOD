@@ -14,9 +14,9 @@ datasets/
     desc.json
   calendar.csv
   district_features.csv
-  district_centroids.csv
+  district_metadata.csv
   rainfall/
-    seoul_rain_2024*.csv
+    seoul_rain_hourly_2024.csv
 ```
 
 The dataset release is distributed separately from this code repository.
@@ -29,10 +29,10 @@ repository root with:
 
 ```bash
 python scripts/build_basicts_dataset.py \
-  --input-dir raw/parquet --output-dir datasets --level district --years 2024
+  --input-dir raw --output-dir datasets --level district --years 2024
 
 python scripts/build_basicts_dataset.py \
-  --input-dir raw/parquet --output-dir datasets --level subdistrict --years 2024
+  --input-dir raw --output-dir datasets --level subdistrict --years 2024
 ```
 
 The calendar, POI, and rainfall files are only needed for contextual

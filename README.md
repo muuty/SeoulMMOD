@@ -27,7 +27,7 @@ To build BasicTS datasets from released parquet files:
 
 ```bash
 python scripts/build_basicts_dataset.py \
-  --input-dir raw/parquet \
+  --input-dir raw \
   --output-dir datasets \
   --level district \
   --years 2024
@@ -74,7 +74,7 @@ python scripts/build_district_rain_dataset.py --year 2024
 ```
 
 These scripts use optional files such as `calendar.csv`,
-`district_features.csv`, `district_centroids.csv`, and rainfall CSVs under
+`district_features.csv`, `district_metadata.csv`, and rainfall CSVs under
 `datasets/`.
 
 ## Citation

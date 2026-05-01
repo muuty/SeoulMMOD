@@ -177,7 +177,7 @@ def build_mode_dataset(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", type=Path, default=Path("raw/parquet"))
+    parser.add_argument("--input-dir", type=Path, default=Path("raw"))
     parser.add_argument("--output-dir", type=Path, default=Path("datasets"))
     parser.add_argument("--level", choices=["district", "subdistrict"], required=True)
     parser.add_argument("--years", type=int, nargs="+", default=[2024])

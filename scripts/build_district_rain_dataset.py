@@ -1,17 +1,15 @@
-"""Augment a SeoulMMOD district-scale dataset with origin/destination hourly rainfall channels.
+"""Augment a SeoulMMOD district-scale dataset with origin/destination rainfall channels.
 
 Pipeline:
-  1. Load 12 monthly Seoul AWS rain CSVs (10-min interval, per-station)
-     for the requested year.
-  2. Aggregate to (district, hour) hourly rainfall (mm/h):
-       - sum the 6 ten-minute readings per station-hour,
-       - mean across stations within the district.
-  3. Map district name -> 5-digit admin code via district_centroids.csv.
-  4. For each (origin district, destination district, hour) bucket,
+  1. Load hourly district rainfall for the requested year.
+  2. For each (origin district, destination district, hour) bucket,
      attach (rain_o, rain_d).
-  5. Z-score using train portion (first 70% of T) after log1p.
-  6. Concat to existing (T, 625, 8) -> (T, 625, 10) =
+  3. Z-score using train portion (first 70% of T) after log1p.
+  4. Concat to existing (T, 625, 8) -> (T, 625, 10) =
        [6 modes, rain_o, rain_d, tod, dow].
+
+Rainfall input: datasets/rainfall/seoul_rain_hourly_{year}.csv
+  timestamp, district_cd, rain_mm
 
 Output: datasets/SeoulMMOD_District_{year}_rain/
 """
@@ -21,7 +19,6 @@ import argparse
 import json
 import shutil
 from datetime import date as Date
-from glob import glob
 from pathlib import Path
 
 import numpy as np
@@ -33,37 +30,17 @@ TRAIN_RATIO = 0.7
 STEPS_PER_DAY = 24
 
 
-def load_rain_year(rain_glob: str) -> pd.DataFrame:
-    files = sorted(glob(rain_glob))
-    print(f'Loading {len(files)} rain CSVs from {rain_glob}...')
-    dfs = []
-    for f in files:
-        df = pd.read_csv(f, encoding='cp949')
-        df.columns = ['station_code', 'station_name', 'district_code', 'district_name', 'rain_10min', 'ts']
-        dfs.append(df[['station_name', 'district_name', 'rain_10min', 'ts']])
-    rain = pd.concat(dfs, ignore_index=True)
-    rain['ts'] = pd.to_datetime(rain['ts'], format='mixed')
-    rain['rain_10min'] = pd.to_numeric(rain['rain_10min'], errors='coerce').fillna(0.0)
-    rain['date'] = rain['ts'].dt.date
-    rain['hour'] = rain['ts'].dt.hour
-    print(f'  total rows: {len(rain):,}')
+def load_rain_year(rain_path: Path) -> pd.DataFrame:
+    print(f'Loading hourly rainfall from {rain_path}...')
+    rain = pd.read_csv(rain_path, dtype={'district_cd': str})
+    required = {'timestamp', 'district_cd', 'rain_mm'}
+    missing = required - set(rain.columns)
+    if missing:
+        raise ValueError(f'rainfall file missing columns {sorted(missing)}: {rain_path}')
+    rain['timestamp'] = pd.to_datetime(rain['timestamp'], format='mixed')
+    rain['rain_mm'] = pd.to_numeric(rain['rain_mm'], errors='coerce').fillna(0.0)
+    print(f'  rows: {len(rain):,}; rain_mm mean={rain.rain_mm.mean():.4f}, max={rain.rain_mm.max():.2f}')
     return rain
-
-
-def aggregate_to_district_hour(rain: pd.DataFrame) -> pd.DataFrame:
-    print('Aggregating to (district, date, hour) hourly mm...')
-    per_station = (
-        rain.groupby(['station_name', 'district_name', 'date', 'hour'], as_index=False)
-        ['rain_10min'].sum()
-    )
-    per_district_hour = (
-        per_station.groupby(['district_name', 'date', 'hour'], as_index=False)
-        ['rain_10min'].mean()
-    )
-    per_district_hour = per_district_hour.rename(columns={'rain_10min': 'rain_mm'})
-    print(f'  {len(per_district_hour):,} (district, date, hour) rows; '
-          f'rain_mm mean={per_district_hour.rain_mm.mean():.4f}, max={per_district_hour.rain_mm.max():.2f}')
-    return per_district_hour
 
 
 def main() -> None:
@@ -73,8 +50,8 @@ def main() -> None:
 
     src = REPO / 'datasets' / f'SeoulMMOD_District_{args.year}'
     out = REPO / 'datasets' / f'SeoulMMOD_District_{args.year}_rain'
-    rain_glob = str(REPO / 'datasets' / 'rainfall' / f'seoul_rain_{args.year}*.csv')
-    district_cent_path = REPO / 'datasets' / 'district_centroids.csv'
+    rain_path = REPO / 'datasets' / 'rainfall' / f'seoul_rain_hourly_{args.year}.csv'
+    district_meta_path = REPO / 'datasets' / 'district_metadata.csv'
     out.mkdir(parents=True, exist_ok=True)
 
     with open(src / 'desc.json') as f:
@@ -87,39 +64,29 @@ def main() -> None:
         od = json.load(f)
     pairs = od['od_pairs']
 
-    district_cent = pd.read_csv(district_cent_path)
+    district_meta = pd.read_csv(district_meta_path, dtype={'district_cd': str})
     code_col = 'district_cd'
-    name_col = 'district_name'
-    missing_cols = [col for col in [code_col, name_col] if col not in district_cent.columns]
+    missing_cols = [col for col in [code_col] if col not in district_meta.columns]
     if missing_cols:
-        raise ValueError(f'district centroids missing columns {missing_cols}: {district_cent_path}')
-    district_cent['district_cd_str'] = district_cent[code_col].astype(str)
-    name_to_cd = dict(zip(district_cent[name_col], district_cent['district_cd_str']))
-    print(f'name_to_cd: {len(name_to_cd)} mappings')
+        raise ValueError(f'district metadata missing columns {missing_cols}: {district_meta_path}')
 
-    all_districts = sorted(name_to_cd.values())
+    all_districts = sorted(district_meta[code_col].astype(str).tolist())
     district_idx = {cd: i for i, cd in enumerate(all_districts)}
     print(f'district order (first 5): {all_districts[:5]}, count: {len(all_districts)}')
 
-    rain = load_rain_year(rain_glob)
-    per_district_hour = aggregate_to_district_hour(rain)
-
     base = Date(args.year, 1, 1)
     rain_mat = np.zeros((T, len(all_districts)), dtype=np.float32)
+    rain = load_rain_year(rain_path)
+    unknown_districts = sorted(set(rain['district_cd']) - set(district_idx))
+    if unknown_districts:
+        raise ValueError(f'rainfall file has unknown district_cd values: {unknown_districts[:5]}')
     n_filled = 0
-    for _, row in per_district_hour.iterrows():
-        district_name = row['district_name']
-        if district_name not in name_to_cd:
-            continue
-        cd = name_to_cd[district_name]
-        if cd not in district_idx:
-            continue
+    for _, row in rain.iterrows():
+        cd = str(row['district_cd'])
         gi = district_idx[cd]
-        day_idx = (row['date'] - base).days
-        if day_idx < 0:
-            continue
-        t_idx = day_idx * STEPS_PER_DAY + int(row['hour'])
-        if t_idx >= T:
+        t_idx = int((row['timestamp'].to_pydatetime().date() - base).days * STEPS_PER_DAY
+                    + row['timestamp'].hour)
+        if t_idx < 0 or t_idx >= T:
             continue
         rain_mat[t_idx, gi] = float(row['rain_mm'])
         n_filled += 1
