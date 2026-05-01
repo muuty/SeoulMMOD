@@ -1,84 +1,54 @@
 # SeoulMMOD Code
 
-This repository contains the benchmark code for SeoulMMOD, including
-BasicTS-based baselines, OD-native model runners, and scripts used to
-reproduce the experiments in the paper. It is intentionally compact:
-datasets, trained checkpoints, and experiment logs are not included.
+Code for SeoulMMOD benchmark experiments.
 
-## Contents
+Datasets, checkpoints, and logs are not included.
 
-- `basicts/`: the BasicTS framework code used by the benchmark.
-- `baselines/`: model definitions and SeoulMMOD configuration files for
-  Historical Average, Latest Value, STAEformer, STID, AGCRN, Graph WaveNet,
-  MTGNN, iTransformer, SOFTS, MTSMixer, and TimeMixer.
-- `scripts/run_od_native.py`: the OD-matrix runner for MPGCN, ODCRN, and
-  ODMixer.
-- `od_baselines/`: compact source copies for MPGCN, ODCRN, and ODMixer used by
-  the OD-native runner.
-- `scripts/data_preparation/`: scripts that build the base GU/Dong BasicTS
-  datasets and contextual dataset variants.
-- `experiments/`: BasicTS train/evaluate entry points.
-- `raw/`: optional location for raw or parquet source files used by the
-  conversion scripts. `raw/` is ignored by git and can be created as needed.
+## Table of Contents
+
+- [Structure](#structure)
+- [Setup](#setup)
+- [Data](#data)
+- [BasicTS Baselines](#basicts-baselines)
+- [OD Baselines](#od-baselines)
+- [Contextual Variants](#contextual-variants)
+- [Cross-Year Evaluation](#cross-year-evaluation)
+- [Source Code and Citations](#source-code-and-citations)
+
+## Structure
+
+```text
+baselines/                 BasicTS baseline configs and model code
+basicts/                   BasicTS framework code used in the benchmark
+datasets/                  processed datasets and optional metadata
+experiments/               train, evaluate, inference, cross-year scripts
+od_baselines/              MPGCN, ODCRN, and ODMixer source code
+scripts/                   OD baseline runner and data builders
+```
 
 ## Setup
 
 ```bash
-conda create -n seoulmmod python=3.10
-conda activate seoulmmod
 pip install -r requirements.txt
 ```
 
-Install a PyTorch build that matches your CUDA version if the default resolver
-does not choose the desired wheel.
+## Data
 
-The code was tested with Python 3.10. The benchmark uses dataset metadata when
-loading configuration files, so training and evaluation commands require the
-processed dataset directories described below.
-
-External baseline and framework code is included only where it is needed by the
-benchmark runner, with original notices kept where available. See
-[Source Code and Citations](#source-code-and-citations) for upstream links,
-licenses, and citation information.
-
-## Source Code and Citations
-
-This repository includes compact source copies or derived code from the
-following projects.
-
-| Component | Use in this repository | Source | License or notice | Citation |
-|---|---|---|---|---|
-| BasicTS | Training framework and baseline runner code under `basicts/` | https://github.com/zezhishao/BasicTS | Apache-2.0 | Shao et al., 2024 |
-| MPGCN | OD-native baseline source under `od_baselines/MPGCN/` | https://github.com/underdoc-wang/MPGCN | MIT license included in `od_baselines/MPGCN/LICENSE` | Shi et al., 2020 |
-| ODCRN | OD-native baseline source under `od_baselines/ODCRN/` | https://github.com/deepkashiwa20/ODCRN | Upstream repository does not include a separate license file. The source copy is included for benchmark reproducibility. | Jiang et al., 2021 |
-| ODMixer | OD-native baseline source under `od_baselines/ODMixer/` | https://github.com/KLatitude/ODMixer | Upstream repository does not include a separate license file. The source copy is included for benchmark reproducibility. | Han et al., 2024 |
-
-Please cite the original model papers when using the corresponding baselines.
-
-## Data Layout
-
-Place processed BasicTS datasets under `datasets/`. Each dataset directory
-should contain:
+Place BasicTS datasets under `datasets/`.
 
 ```text
 datasets/
   SeoulMOD_GU_2024/
     data.dat
     desc.json
+    od_pairs.json
   SeoulMOD_2024/
     data.dat
     desc.json
+    od_pairs.json
 ```
 
-The BasicTS configs load datasets by name, so
-`baselines/STAEformer/SeoulMOD_GU_2024_allmode.py` expects
-`datasets/SeoulMOD_GU_2024/`, while
-`baselines/STAEformer/SeoulMOD_2024_allmode.py` expects
-`datasets/SeoulMOD_2024/`.
-
-The data release is distributed separately from this code repository. If the
-processed parquet files are available under `raw/parquet/`, build the base
-datasets with:
+To build datasets from released parquet files:
 
 ```bash
 python scripts/data_preparation/build_basicts_dataset.py \
@@ -94,13 +64,9 @@ python scripts/data_preparation/build_basicts_dataset.py \
   --years 2024
 ```
 
-The builder expects `od_flow_{year}.parquet`, where each file contains hourly
-OD flows by transport mode. Keep raw source files under `raw/`. The `raw/`
-directory is ignored by git.
+The builder expects `od_flow_{year}.parquet`.
 
 ## BasicTS Baselines
-
-Run a district-scale model with:
 
 ```bash
 python experiments/train.py \
@@ -108,12 +74,11 @@ python experiments/train.py \
   -g 0
 ```
 
-The same entry point works for other BasicTS configs under `baselines/`.
-Checkpoints are written to `checkpoints/`, and logs are written to `logs/`.
+Use another config under `baselines/` to run a different model.
 
-## OD-Native Baselines
+## OD Baselines
 
-MPGCN, ODCRN, and ODMixer use the matrix-shaped OD runner:
+MPGCN, ODCRN, and ODMixer use one runner.
 
 ```bash
 python scripts/run_od_native.py \
@@ -124,26 +89,27 @@ python scripts/run_od_native.py \
   --gpu 0
 ```
 
-Use `--model mpgcn` or `--model odcrn` for the other OD-native baselines.
+Set `--model` to `mpgcn`, `odcrn`, or `odmixer`.
 
 ## Contextual Variants
 
-The contextual ablation in the appendix uses STID extended with calendar,
-rainfall, or POI signals on auxiliary dataset variants. Build the variants
-from the base GU dataset (defaults to year 2024):
+Build GU-level contextual datasets:
 
 ```bash
 python scripts/data_preparation/SeoulMOD_GU_ctx/build_dataset.py --year 2024
 python scripts/data_preparation/SeoulMOD_GU_rain/build_dataset.py --year 2024
 ```
 
-The `_ctx` build adds a holiday-state channel and reads
-`datasets/calendar.csv`. The `_rain` build aggregates the Seoul AWS rain
-CSVs in `datasets/rainfall/` and adds origin/destination rainfall channels.
-POI is loaded directly inside the model from `datasets/gu_features.csv` and
-does not need a dataset rebuild.
+Expected metadata:
 
-Train a contextual variant with:
+```text
+datasets/calendar.csv
+datasets/gu_features.csv
+datasets/gu_centroids.csv
+datasets/rainfall/seoul_rain_2024*.csv
+```
+
+Example:
 
 ```bash
 python experiments/train.py \
@@ -153,11 +119,19 @@ python experiments/train.py \
 
 ## Cross-Year Evaluation
 
-Train on the 2024 calendar and evaluate per-season MAE on the 2025
-calendar (Section 4.5 of the paper):
-
 ```bash
 python experiments/eval_crossyear.py \
   -c baselines/STAEformer/SeoulMOD_GU_2024_allmode.py \
   --test-dataset SeoulMOD_GU_2025
 ```
+
+## Source Code and Citations
+
+| Component | Source | Citation |
+|---|---|---|
+| BasicTS | https://github.com/zezhishao/BasicTS | Shao et al., 2024. Exploring Progress in Multivariate Time Series Forecasting: Comprehensive Benchmarking and Heterogeneity Analysis |
+| MPGCN | https://github.com/underdoc-wang/MPGCN | Shi et al., 2020. Predicting Origin-Destination Flow via Multi-Perspective Graph Convolutional Network |
+| ODCRN | https://github.com/deepkashiwa20/ODCRN | Jiang et al., 2021. Countrywide Origin-Destination Matrix Prediction and Its Application for COVID-19 |
+| ODMixer | https://github.com/KLatitude/ODMixer | Liu et al., 2024. Fine-grained Spatial-temporal MLP Architecture for Metro Origin-Destination Prediction |
+
+Please cite the original papers when using these components.
