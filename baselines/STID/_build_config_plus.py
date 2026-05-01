@@ -1,4 +1,4 @@
-"""CFG factory for STIDPlus on SeoulMOD GU - holiday / POI / dist+time ablations."""
+"""CFG factory for STIDPlus on SeoulMMOD district - holiday / POI / dist+time ablations."""
 from __future__ import annotations
 
 import os
@@ -15,7 +15,7 @@ from .arch import STIDPlus
 
 
 NUM_EPOCHS = 100
-GU_POI_CATEGORIES = [
+DISTRICT_POI_CATEGORIES = [
     'poi_food_dining', 'poi_cafe_bar', 'poi_retail_shopping',
     'poi_health_medical', 'poi_beauty_wellness', 'poi_education',
     'poi_office_professional', 'poi_accommodation', 'poi_culture_leisure',
@@ -23,7 +23,7 @@ GU_POI_CATEGORIES = [
 ]
 DEFAULT_POI_PATH = os.environ.get(
     'SEOULMMOD_POI_PATH',
-    os.path.join('datasets', 'gu_features.csv'),
+    os.path.join('datasets', 'district_features.csv'),
 )
 
 
@@ -117,7 +117,7 @@ def build_config(*, dataset_name: str, num_nodes: int,
     if if_poi:
         model_param['if_poi'] = True
         model_param['poi_features_path'] = DEFAULT_POI_PATH
-        model_param['poi_categories'] = GU_POI_CATEGORIES
+        model_param['poi_categories'] = DISTRICT_POI_CATEGORIES
         model_param['poi_dim'] = 32
         model_param['poi_hidden'] = 64
         model_param['dataset_name'] = dataset_name

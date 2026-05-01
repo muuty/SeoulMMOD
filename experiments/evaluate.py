@@ -12,9 +12,9 @@ import basicts
 def parse_args():
     parser = ArgumentParser(description='Evaluate time series forecasting model in BasicTS framework!')
     # enter your config file path
-    parser.add_argument('-cfg', '--config', default='baselines/STID/SeoulMOD_GU_2024_allmode.py', help='training config')
+    parser.add_argument('-cfg', '--config', default='baselines/STID/SeoulMMOD_District_2024_allmode.py', help='training config')
     # enter your own checkpoint file path
-    parser.add_argument('-ckpt', '--checkpoint', default='checkpoints/STID/SeoulMOD_GU_2024_100_24_24/STID_best_val_MAE.pt')
+    parser.add_argument('-ckpt', '--checkpoint', default='checkpoints/STID/SeoulMMOD_District_2024_100_24_24/STID_best_val_MAE.pt')
     parser.add_argument('-g', '--gpus', default='5')
     parser.add_argument('-d', '--device_type', default='gpu')
     parser.add_argument('-b', '--batch_size', default=None) # use the batch size in the config file

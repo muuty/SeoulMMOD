@@ -34,9 +34,11 @@ def parquet_union(input_dir: Path, years: list[int]) -> str:
 
 
 def default_dataset_name(level: str, years: list[int]) -> str:
-    parts = ["SeoulMOD"]
-    if level == "gu":
-        parts.append("GU")
+    parts = ["SeoulMMOD"]
+    if level == "district":
+        parts.append("District")
+    else:
+        parts.append("Subdistrict")
     if len(years) == 1:
         parts.append(str(years[0]))
     else:
@@ -45,7 +47,7 @@ def default_dataset_name(level: str, years: list[int]) -> str:
 
 
 def od_expr(level: str) -> tuple[str, str]:
-    if level == "gu":
+    if level == "district":
         return "SUBSTRING(origin, 1, 5)", "SUBSTRING(dest, 1, 5)"
     return "origin", "dest"
 
@@ -62,7 +64,7 @@ def write_desc(
     t_steps, n_nodes, n_features = shape
     desc = {
         "name": name,
-        "domain": f"multimodal OD flow ({level}-level)",
+        "domain": f"multimodal OD flow ({level} scale)",
         "shape": [t_steps, n_nodes, n_features],
         "num_time_steps": t_steps,
         "num_nodes": n_nodes,
@@ -177,7 +179,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", type=Path, default=Path("raw/parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("datasets"))
-    parser.add_argument("--level", choices=["gu", "dong"], required=True)
+    parser.add_argument("--level", choices=["district", "subdistrict"], required=True)
     parser.add_argument("--years", type=int, nargs="+", default=[2024])
     parser.add_argument("--name", default=None)
     args = parser.parse_args()

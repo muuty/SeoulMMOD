@@ -38,11 +38,11 @@ Place BasicTS datasets under `datasets/`.
 
 ```text
 datasets/
-  SeoulMOD_GU_2024/
+  SeoulMMOD_District_2024/
     data.dat
     desc.json
     od_pairs.json
-  SeoulMOD_2024/
+  SeoulMMOD_Subdistrict_2024/
     data.dat
     desc.json
     od_pairs.json
@@ -54,13 +54,13 @@ To build datasets from released parquet files:
 python scripts/data_preparation/build_basicts_dataset.py \
   --input-dir raw/parquet \
   --output-dir datasets \
-  --level gu \
+  --level district \
   --years 2024
 
 python scripts/data_preparation/build_basicts_dataset.py \
   --input-dir raw/parquet \
   --output-dir datasets \
-  --level dong \
+  --level subdistrict \
   --years 2024
 ```
 
@@ -70,7 +70,7 @@ The builder expects `od_flow_{year}.parquet`.
 
 ```bash
 python experiments/train.py \
-  -c baselines/STAEformer/SeoulMOD_GU_2024_allmode.py \
+  -c baselines/STAEformer/SeoulMMOD_District_2024_allmode.py \
   -g 0
 ```
 
@@ -83,9 +83,9 @@ MPGCN, ODCRN, and ODMixer use one runner.
 ```bash
 python scripts/run_od_native.py \
   --model odmixer \
-  --level gu \
+  --level district \
   --horizon 24 \
-  --data_dir datasets/SeoulMOD_GU_2024 \
+  --data_dir datasets/SeoulMMOD_District_2024 \
   --gpu 0
 ```
 
@@ -93,19 +93,19 @@ Set `--model` to `mpgcn`, `odcrn`, or `odmixer`.
 
 ## Contextual Variants
 
-Build GU-level contextual datasets:
+Build district-scale contextual datasets:
 
 ```bash
-python scripts/data_preparation/SeoulMOD_GU_ctx/build_dataset.py --year 2024
-python scripts/data_preparation/SeoulMOD_GU_rain/build_dataset.py --year 2024
+python scripts/data_preparation/SeoulMMOD_District_ctx/build_dataset.py --year 2024
+python scripts/data_preparation/SeoulMMOD_District_rain/build_dataset.py --year 2024
 ```
 
 Expected metadata:
 
 ```text
 datasets/calendar.csv
-datasets/gu_features.csv
-datasets/gu_centroids.csv
+datasets/district_features.csv
+datasets/district_centroids.csv
 datasets/rainfall/seoul_rain_2024*.csv
 ```
 
@@ -113,7 +113,7 @@ Example:
 
 ```bash
 python experiments/train.py \
-  -c baselines/STID/holiday_SeoulMOD_GU_2024_h24.py \
+  -c baselines/STID/holiday_SeoulMMOD_District_2024_h24.py \
   -g 0
 ```
 
@@ -121,8 +121,8 @@ python experiments/train.py \
 
 ```bash
 python experiments/eval_crossyear.py \
-  -c baselines/STAEformer/SeoulMOD_GU_2024_allmode.py \
-  --test-dataset SeoulMOD_GU_2025
+  -c baselines/STAEformer/SeoulMMOD_District_2024_allmode.py \
+  --test-dataset SeoulMMOD_District_2025
 ```
 
 ## Source Code and Citations

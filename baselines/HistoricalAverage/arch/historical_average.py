@@ -2,7 +2,7 @@
 
 The lookup table is built once at ``__init__`` from the dataset's training
 portion (matching the sequence-based train/val/test split used by other
-SeoulMOD baselines). Predictions in forward are looked up by hour-of-week
+SeoulMMOD baselines). Predictions in forward are looked up by hour-of-week
 on the future tod/dow channels — no learnable parameters, no gradient flow.
 
 The table is stored in normalized space (matching BasicTS's ZScoreScaler
@@ -11,7 +11,7 @@ the framework's standard ``inverse_transform`` brings predictions back to
 raw flow units at metric time. This keeps HA on the same eval pipeline
 and metrics as the other baselines.
 
-Channel layout assumed (matches SeoulMOD_2024 / SeoulMOD_GU_2024):
+Channel layout assumed (matches SeoulMMOD_Subdistrict_2024 / SeoulMMOD_District_2024):
     channels [0:6]: mode flows (target_channel)
     channel 6:      time-of-day, normalized to [0, 1]
     channel 7:      day-of-week, normalized to [0, 1]

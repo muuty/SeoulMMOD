@@ -1,6 +1,6 @@
-"""Unified trainer for OD-native baselines on SeoulMOD.
+"""Unified trainer for OD-native baselines on SeoulMMOD.
 
-Loads SeoulMOD GU/Dong memmap, reshapes to [T, N, N, C], trains selected model
+Loads SeoulMMOD district/sub-district memmap, reshapes to [T, N, N, C], trains selected model
 under T=H (input_len = output_len = horizon) protocol with multi-mode joint
 input/output (6 channels), and reports MAE/RMSE/MAPE averaged over horizon.
 
@@ -17,7 +17,6 @@ import numpy as np
 import torch
 from torch import nn, optim
 from torch.utils.data import Dataset, DataLoader
-from scipy.spatial import distance
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(REPO, 'od_baselines', 'MPGCN'))
@@ -234,8 +233,8 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('--model', choices=['odcrn', 'mpgcn', 'odmixer'], required=True)
     p.add_argument('--data_dir', type=str,
-                   default=os.path.join(REPO, 'datasets', 'SeoulMOD_GU_2024'))
-    p.add_argument('--level', type=str, choices=['gu', 'dong'], default='gu')
+                   default=os.path.join(REPO, 'datasets', 'SeoulMMOD_District_2024'))
+    p.add_argument('--level', type=str, choices=['district', 'subdistrict'], default='district')
     p.add_argument('--horizon', type=int, required=True)
     p.add_argument('--input_len', type=int, default=None,
                    help='Defaults to horizon (T=H protocol)')
@@ -376,7 +375,8 @@ def main():
     patience = args.patience
     run_name = args.run_name or f'{args.model}_allmode_2024_{args.level}'
     # BasicTS-style output dir
-    subdir_name = f'SeoulMOD_{"GU_" if args.level == "gu" else ""}2024_{args.epochs}_{T_in}_{T_out}'
+    dataset_tag = 'District' if args.level == 'district' else 'Subdistrict'
+    subdir_name = f'SeoulMMOD_{dataset_tag}_2024_{args.epochs}_{T_in}_{T_out}'
     ts = datetime.now().strftime('%Y%m%d%H%M%S')
     out_dir = os.path.join(args.output_root, run_name, subdir_name, ts)
     os.makedirs(out_dir, exist_ok=True)

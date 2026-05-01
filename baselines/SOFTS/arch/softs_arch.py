@@ -119,7 +119,7 @@ class SOFTS(nn.Module):
             torch.Tensor: outputs with shape [B, L2, N, 1]
         """
 
-        # Some datasets (e.g. SeoulMOD ODPairDataset) only expose the target value
+        # Some datasets (e.g. SeoulMMOD ODPairDataset) only expose the target value
         # channel and do not provide extra temporal covariates in C.
         if history_data.shape[-1] > 1 and self.time_of_day_size is not None:
             history_data[..., 1] = history_data[..., 1] * self.time_of_day_size // (self.time_of_day_size / 24) / 23.0

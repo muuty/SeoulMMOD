@@ -37,7 +37,7 @@ def build_config(dataset_name: str, num_nodes: int,
         'output_len': output_len,
     })
 
-    # ZScoreScaler matches other SeoulMOD baselines. LV repeats the last input
+    # ZScoreScaler matches other SeoulMMOD baselines. LV repeats the last input
     # frame, which (under the scaler) is in normalized space — framework
     # inverse_transform restores raw scale for metric computation.
     CFG.SCALER = EasyDict()

@@ -1,0 +1,125 @@
+import os
+import sys
+import numpy as np
+from easydict import EasyDict
+
+sys.path.append(os.path.abspath(__file__ + '/../../..'))
+
+from basicts.data import ODPairDataset
+from basicts.metrics import masked_mae, masked_rmse
+from basicts.runners import SimpleTimeSeriesForecastingRunner
+from basicts.utils import get_regular_settings
+
+from basicts.scaler import SeoulMMODGlobalZScoreScaler
+
+from .arch import iTransformer
+
+DATA_NAME = 'SeoulMMOD_District_2024_m1'
+regular_settings = get_regular_settings(DATA_NAME)
+INPUT_LEN = regular_settings['INPUT_LEN']
+OUTPUT_LEN = regular_settings['OUTPUT_LEN']
+TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
+
+MODEL_ARCH = iTransformer
+MODEL_PARAM = {
+    "task_name": "forecast",
+    "enc_in": 1,
+    "dec_in": 1,
+    "c_out": 1,
+    "seq_len": INPUT_LEN,
+    "pred_len": OUTPUT_LEN,
+    "factor": 3,
+    "d_model": 512,
+    "n_heads": 8,
+    "e_layers": 3,
+    "d_ff": 512,
+    "dropout": 0.1,
+    "freq": "h",
+    "use_norm": True,
+    "output_attention": False,
+    "embed": "fixed",
+    "activation": "gelu",
+}
+NUM_EPOCHS = 100
+
+CFG = EasyDict()
+CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_District_2024_m1 mode-sep (local_bus)'
+CFG.GPU_NUM = 1
+CFG.RUNNER = SimpleTimeSeriesForecastingRunner
+
+CFG.DATASET = EasyDict()
+CFG.DATASET.NAME = DATA_NAME
+CFG.DATASET.TYPE = ODPairDataset
+CFG.DATASET.PARAM = EasyDict({
+    'dataset_name': DATA_NAME,
+    'train_val_test_ratio': TRAIN_VAL_TEST_RATIO,
+    'input_len': INPUT_LEN,
+    'output_len': OUTPUT_LEN,
+    'n_modes': 1,
+    'node_sample_size': 0,
+})
+
+CFG.SCALER = EasyDict()
+CFG.SCALER.TYPE = SeoulMMODGlobalZScoreScaler
+CFG.SCALER.PARAM = EasyDict({
+    'dataset_name': DATA_NAME,
+    'train_ratio': TRAIN_VAL_TEST_RATIO[0],
+    'norm_each_channel': False,
+    'rescale': True,
+    'n_modes': 1,
+})
+
+CFG.MODEL = EasyDict()
+CFG.MODEL.NAME = MODEL_ARCH.__name__
+CFG.MODEL.ARCH = MODEL_ARCH
+CFG.MODEL.PARAM = MODEL_PARAM
+CFG.MODEL.FORWARD_FEATURES = [0]
+CFG.MODEL.TARGET_FEATURES = [0]
+
+CFG.METRICS = EasyDict()
+CFG.METRICS.FUNCS = EasyDict({
+    'MAE': masked_mae,
+    'RMSE': masked_rmse,
+})
+CFG.METRICS.TARGET = 'MAE'
+CFG.METRICS.NULL_VAL = np.nan
+
+CFG.TRAIN = EasyDict()
+CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
+CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
+    'checkpoints',
+    MODEL_ARCH.__name__,
+    '_'.join([DATA_NAME, 'modesep_2024', str(CFG.TRAIN.NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)])
+)
+CFG.TRAIN.LOSS = masked_mae
+CFG.TRAIN.OPTIM = EasyDict()
+CFG.TRAIN.OPTIM.TYPE = "Adam"
+CFG.TRAIN.OPTIM.PARAM = {
+    "lr": 0.0005,
+    "weight_decay": 0.0001,
+}
+CFG.TRAIN.LR_SCHEDULER = EasyDict()
+CFG.TRAIN.LR_SCHEDULER.TYPE = "MultiStepLR"
+CFG.TRAIN.LR_SCHEDULER.PARAM = {
+    "milestones": [1, 25, 50],
+    "gamma": 0.5
+}
+CFG.TRAIN.CLIP_GRAD_PARAM = {
+    'max_norm': 5.0
+}
+CFG.TRAIN.DATA = EasyDict()
+CFG.TRAIN.DATA.BATCH_SIZE = 256
+CFG.TRAIN.DATA.SHUFFLE = True
+
+CFG.VAL = EasyDict()
+CFG.VAL.INTERVAL = 1
+CFG.VAL.DATA = EasyDict()
+CFG.VAL.DATA.BATCH_SIZE = 256
+
+CFG.TEST = EasyDict()
+CFG.TEST.INTERVAL = 1
+CFG.TEST.DATA = EasyDict()
+CFG.TEST.DATA.BATCH_SIZE = 256
+
+CFG.EVAL = EasyDict()
+CFG.EVAL.USE_GPU = True

@@ -8,7 +8,7 @@ Holiday: per-timestep categorical state (workday=0 / weekend=1 / holiday=2).
   Activated by ``if_holiday=True`` and ``holiday_index=<channel>``. Stored in the
   dataset as ``state / holiday_size`` (recovered via ``(val * size).long()``).
 
-POI: per-node static features (e.g. 13 GU-level POI categories), looked up from
+POI: per-node static features (e.g. 13 district-scale POI categories), looked up from
   ``poi_features_path`` (CSV) at __init__ and combined into a per-pair feature
   via ``concat(origin_poi, dest_poi)``. Activated by ``if_poi=True``.
 
@@ -37,8 +37,8 @@ def _build_poi_pair_features(poi_features_path: str, dataset_name: str,
                              repo_root: Path) -> np.ndarray:
     """Return (num_nodes, 2 * len(poi_categories)) per-pair feature matrix.
 
-    Each pair (origin_gu, dest_gu) gets concat(origin_poi, dest_poi). Pair order
-    must match the dataset's node axis (i.e. order in od_pairs.json).
+    Each pair gets concat(origin_poi, dest_poi). Pair order must match the
+    dataset's node axis (i.e. order in od_pairs.json).
     """
     od_path = repo_root / 'datasets' / dataset_name / 'od_pairs.json'
     with open(od_path) as f:
@@ -48,21 +48,22 @@ def _build_poi_pair_features(poi_features_path: str, dataset_name: str,
         raise ValueError(f'pair count mismatch: dataset N={num_nodes} vs od_pairs len={len(pairs)}')
 
     df = pd.read_csv(poi_features_path)
-    if 'dong_cd' not in df.columns:
-        raise ValueError(f'gu features file missing dong_cd column: {poi_features_path}')
-    df['dong_cd'] = df['dong_cd'].astype(int)
-    poi_by_gu = {row['dong_cd']: row[poi_categories].to_numpy(dtype=np.float32)
-                 for _, row in df.iterrows()}
+    code_col = 'district_cd' if 'district_cd' in df.columns else 'dong_cd'
+    if code_col not in df.columns:
+        raise ValueError(f'district features file missing district_cd column: {poi_features_path}')
+    df[code_col] = df[code_col].astype(int)
+    poi_by_district = {row[code_col]: row[poi_categories].to_numpy(dtype=np.float32)
+                       for _, row in df.iterrows()}
 
     K = len(poi_categories)
     feats = np.zeros((num_nodes, 2 * K), dtype=np.float32)
     for idx, (o, d) in enumerate(pairs):
         o_int = int(o)
         d_int = int(d)
-        if o_int not in poi_by_gu or d_int not in poi_by_gu:
-            raise ValueError(f'pair {idx} ({o},{d}): gu not in POI table')
-        feats[idx, :K] = poi_by_gu[o_int]
-        feats[idx, K:] = poi_by_gu[d_int]
+        if o_int not in poi_by_district or d_int not in poi_by_district:
+            raise ValueError(f'pair {idx} ({o},{d}): district not in POI table')
+        feats[idx, :K] = poi_by_district[o_int]
+        feats[idx, K:] = poi_by_district[d_int]
     return feats
 
 

@@ -42,7 +42,7 @@ def build_config(dataset_name: str, num_nodes: int,
         'output_len': output_len,
     })
 
-    # ZScoreScaler matches the scaler used by other SeoulMOD baselines (STID,
+    # ZScoreScaler matches the scaler used by other SeoulMMOD baselines (STID,
     # iTransformer, SOFTS, etc.). HA's lookup table is stored in normalized
     # space inside the arch, so framework transform/inverse_transform pipeline
     # produces raw-scale metrics equivalent to ``eval_naive_baselines_gpu.py``.

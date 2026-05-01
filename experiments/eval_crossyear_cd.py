@@ -31,7 +31,7 @@ def load_config(path: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-c", "--cfg", required=True, help="2024 training config")
-    ap.add_argument("--test-dataset", required=True, help="2025 dataset name (e.g. SeoulMOD_GU_2025)")
+    ap.add_argument("--test-dataset", required=True, help="2025 dataset name (e.g. SeoulMMOD_District_2025)")
     ap.add_argument("--gpus", default="0")
     args = ap.parse_args()
 
