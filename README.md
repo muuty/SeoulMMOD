@@ -1,8 +1,51 @@
 # SeoulMMOD
 
-Code for SeoulMMOD benchmark experiments.
+This is the code repository for SeoulMMOD benchmark experiments. SeoulMMOD
+contains hourly multimodal origin-destination flows within Seoul from 2023 to
+2025. It covers six urban transport modes at district and subdistrict scales,
+with aligned administrative metadata and contextual data.
 
-Data, checkpoints, and logs are not included.
+Data, checkpoints, and logs are not included in this repository.
+
+![Annual OD outflow in SeoulMMOD](assets/figure_1.png)
+
+Figure 1. Annual OD outflow in SeoulMMOD from the same Seoul origin at two
+spatial granularities.
+
+We also provide administrative metadata and contextual files for the released
+dataset.
+
+| File | Description |
+|---|---|
+| `raw/od_flow_2023.parquet` | Hourly multimodal OD flow records for 2023. |
+| `raw/od_flow_2024.parquet` | Hourly multimodal OD flow records for 2024. |
+| `raw/od_flow_2025.parquet` | Hourly multimodal OD flow records for 2025. |
+| `district_metadata.csv` | District code, name, and representative coordinates. |
+| `subdistrict_metadata.csv` | Subdistrict code, name, parent district code, and representative coordinates. |
+| `district_boundaries.geojson` | District administrative boundary geometries. |
+| `subdistrict_boundaries.geojson` | Subdistrict administrative boundary geometries. |
+| `calendar.csv` | Weekend and holiday indicators. |
+| `district_poi.csv` | District-level POI category counts based on 2025 data. |
+| `subdistrict_poi.csv` | Subdistrict-level POI category counts based on 2025 data. |
+| `rainfall/seoul_rain_hourly_2023.csv` | Hourly district rainfall for 2023. |
+| `rainfall/seoul_rain_hourly_2024.csv` | Hourly district rainfall for 2024. |
+| `rainfall/seoul_rain_hourly_2025.csv` | Hourly district rainfall for 2025. |
+
+## OD Flow Schema
+
+| Attribute | Description | Values |
+|---|---|---|
+| `date` | Calendar date. | `YYYY-MM-DD` |
+| `st_hour` | Hour of day. | 0-23 |
+| `origin` | Origin administrative code. | District or subdistrict code |
+| `dest` | Destination administrative code. | District or subdistrict code |
+| `mode` | Transport mode code. | 4 metro bus, 5 local bus, 6 subway, 7 walk, 8 car, 9 other |
+| `flow` | Estimated OD flow volume. | Nonnegative real number |
+| `avg_dist_m` | Average travel distance in meters. | Nonnegative real number |
+| `avg_time_min` | Average travel time in minutes. | Nonnegative real number |
+
+The mode order used in the benchmark is `metro_bus`, `local_bus`, `subway`,
+`walk`, `car`, and `other`.
 
 ## Structure
 
