@@ -1,0 +1,20 @@
+# Core deep learning. Install a torch wheel matching your CUDA build first.
+torch>=2.0
+easy-torch==1.3.3
+
+# Configuration and process utilities
+easydict
+packaging
+setproctitle
+tqdm==4.67.1
+tensorboard==2.18.0
+
+# Numerical and scientific
+numpy==1.24.4
+pandas
+duckdb
+scipy
+scikit-learn
+
+# Architecture helpers
+einops
