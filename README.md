@@ -124,9 +124,9 @@ These scripts use optional files such as `calendar.csv`,
 
 Please cite the original papers for external components used in this repository.
 
-| Component | Source | Reference |
+| Component | Source | Paper |
 |---|---|---|
-| BasicTS | https://github.com/zezhishao/BasicTS | Yubo Liang, Zezhi Shao, Fei Wang, Zhao Zhang, Tao Sun, and Yongjun Xu. BasicTS: An Open Source Fair Multivariate Time Series Prediction Benchmark. Bench 2022, LNCS 13852, 87-102, 2023. |
-| MPGCN | https://github.com/underdoc-wang/MPGCN | Hongzhi Shi, Quanming Yao, Qi Guo, Yaguang Li, Lingyu Zhang, Jieping Ye, Yong Li, and Yan Liu. Predicting Origin-Destination Flow via Multi-Perspective Graph Convolutional Network. ICDE 2020, 1818-1821, 2020. |
-| ODCRN | https://github.com/deepkashiwa20/ODCRN | Renhe Jiang, Zhaonan Wang, Zekun Cai, Chuang Yang, Zipei Fan, Tianqi Xia, Go Matsubara, Hiroto Mizuseki, Xuan Song, and Ryosuke Shibasaki. Countrywide Origin-Destination Matrix Prediction and Its Application for COVID-19. ECML PKDD 2021 Applied Data Science Track, LNCS, 319-334, 2021. |
-| ODMixer | https://github.com/KLatitude/ODMixer | Yang Liu, Binglin Chen, Yongsen Zheng, Lechao Cheng, Guanbin Li, and Liang Lin. ODMixer: Fine-Grained Spatial-Temporal MLP for Metro Origin-Destination Prediction. IEEE Transactions on Knowledge and Data Engineering, 2025. |
+| BasicTS | https://github.com/zezhishao/BasicTS | [BasicTS: An Open Source Fair Multivariate Time Series Prediction Benchmark](https://openreview.net/forum?id=vgCXSxW9Mf) |
+| MPGCN | https://github.com/underdoc-wang/MPGCN | [Predicting Origin-Destination Flow via Multi-Perspective Graph Convolutional Network](https://dblp.org/rec/conf/icde/ShiYGLZYLL20) |
+| ODCRN | https://github.com/deepkashiwa20/ODCRN | [Countrywide Origin-Destination Matrix Prediction and Its Application for COVID-19](https://doi.org/10.1007/978-3-030-86514-6_20) |
+| ODMixer | https://github.com/KLatitude/ODMixer | [ODMixer: Fine-Grained Spatial-Temporal MLP for Metro Origin-Destination Prediction](https://arxiv.org/abs/2404.15734) |
