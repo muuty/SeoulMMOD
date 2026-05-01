@@ -13,8 +13,8 @@ with aligned administrative metadata and contextual data.
 |---|---|---|
 | `date` | Calendar date. | `YYYY-MM-DD` |
 | `st_hour` | Hour of day. | 0-23 |
-| `origin` | Origin administrative code. | District or subdistrict code |
-| `dest` | Destination administrative code. | District or subdistrict code |
+| `origin` | Origin subdistrict code. | District-scale datasets use the first five digits |
+| `dest` | Destination subdistrict code. | District-scale datasets use the first five digits |
 | `mode` | Transport mode code. | 4 metro bus, 5 local bus, 6 subway, 7 walk, 8 car, 9 other |
 | `flow` | Estimated OD flow volume. | Nonnegative real number |
 | `avg_dist_m` | Average travel distance in meters. | Nonnegative real number |

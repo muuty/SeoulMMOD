@@ -1,4 +1,4 @@
-"""STID on sub-district-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes).
+"""STID on subdistrict-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes).
 
 OOM test: STID uses node embeddings (N x embed_dim) without N x N attention,
 so memory should be manageable even at 181K nodes.
@@ -46,7 +46,7 @@ MODEL_PARAM = {
 NUM_EPOCHS = 100
 
 CFG = EasyDict()
-CFG.DESCRIPTION = 'STID on SeoulMMOD_Subdistrict_2024 sub-district-scale (OOM probe, 181476 nodes, h=24)'
+CFG.DESCRIPTION = 'STID on SeoulMMOD_Subdistrict_2024 subdistrict-scale (OOM probe, 181476 nodes, h=24)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

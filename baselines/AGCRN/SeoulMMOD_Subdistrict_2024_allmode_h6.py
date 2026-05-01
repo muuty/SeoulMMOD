@@ -1,4 +1,4 @@
-"""AGCRN on sub-district-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes, h=6).
+"""AGCRN on subdistrict-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes, h=6).
 
 OOM test: AGCRN builds adaptive adjacency (N, N) via node embeddings; the
 cheb graph conv at N=181476 is the expected OOM bottleneck.
@@ -41,7 +41,7 @@ NUM_EPOCHS = 100
 BATCH_SIZE = 1
 
 CFG = EasyDict()
-CFG.DESCRIPTION = 'AGCRN on SeoulMMOD_Subdistrict_2024 sub-district-scale (OOM probe, 181476 nodes, h=6)'
+CFG.DESCRIPTION = 'AGCRN on SeoulMMOD_Subdistrict_2024 subdistrict-scale (OOM probe, 181476 nodes, h=6)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

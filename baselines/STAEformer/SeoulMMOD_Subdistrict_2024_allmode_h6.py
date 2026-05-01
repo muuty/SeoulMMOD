@@ -1,7 +1,7 @@
-"""STAEformer on sub-district-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes, h=6).
+"""STAEformer on subdistrict-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes, h=6).
 
 OOM test: ST models are typically designed for small N. This config attempts
-the full sub-district-scale all-mode setting to probe the OOM boundary.
+the full subdistrict-scale all-mode setting to probe the OOM boundary.
 """
 import os
 import sys
@@ -48,7 +48,7 @@ MODEL_PARAM = {
 NUM_EPOCHS = 100
 
 CFG = EasyDict()
-CFG.DESCRIPTION = 'STAEformer on SeoulMMOD_Subdistrict_2024 sub-district-scale (OOM probe, 181476 nodes, h=6)'
+CFG.DESCRIPTION = 'STAEformer on SeoulMMOD_Subdistrict_2024 subdistrict-scale (OOM probe, 181476 nodes, h=6)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

@@ -1,6 +1,6 @@
 """Unified trainer for OD-native baselines on SeoulMMOD.
 
-Loads SeoulMMOD district/sub-district memmap, reshapes to [T, N, N, C], trains selected model
+Loads SeoulMMOD district/subdistrict memmap, reshapes to [T, N, N, C], trains selected model
 under T=H (input_len = output_len = horizon) protocol with multi-mode joint
 input/output (6 channels), and reports MAE/RMSE/MAPE averaged over horizon.
 
