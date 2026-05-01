@@ -88,8 +88,11 @@ def main() -> None:
     pairs = od['od_pairs']
 
     district_cent = pd.read_csv(district_cent_path)
-    code_col = 'district_cd' if 'district_cd' in district_cent.columns else 'gu_cd'
-    name_col = 'district_name' if 'district_name' in district_cent.columns else 'gu_name'
+    code_col = 'district_cd'
+    name_col = 'district_name'
+    missing_cols = [col for col in [code_col, name_col] if col not in district_cent.columns]
+    if missing_cols:
+        raise ValueError(f'district centroids missing columns {missing_cols}: {district_cent_path}')
     district_cent['district_cd_str'] = district_cent[code_col].astype(str)
     name_to_cd = dict(zip(district_cent[name_col], district_cent['district_cd_str']))
     print(f'name_to_cd: {len(name_to_cd)} mappings')

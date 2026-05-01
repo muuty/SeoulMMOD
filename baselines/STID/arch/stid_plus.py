@@ -48,7 +48,7 @@ def _build_poi_pair_features(poi_features_path: str, dataset_name: str,
         raise ValueError(f'pair count mismatch: dataset N={num_nodes} vs od_pairs len={len(pairs)}')
 
     df = pd.read_csv(poi_features_path)
-    code_col = 'district_cd' if 'district_cd' in df.columns else 'dong_cd'
+    code_col = 'district_cd'
     if code_col not in df.columns:
         raise ValueError(f'district features file missing district_cd column: {poi_features_path}')
     df[code_col] = df[code_col].astype(int)
