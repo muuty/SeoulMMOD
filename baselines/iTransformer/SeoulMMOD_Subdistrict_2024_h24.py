@@ -1,6 +1,5 @@
 import os
 import sys
-
 import numpy as np
 from easydict import EasyDict
 
@@ -13,42 +12,41 @@ from basicts.utils import get_regular_settings
 
 from basicts.scaler import SeoulMMODGlobalZScoreScaler
 
-from .arch import TimeMixer
+from .arch import iTransformer
 
 ############################## Hot Parameters ##############################
-DATA_NAME = 'SeoulMMOD_District_2024'
+# Dataset & Metrics configuration
+DATA_NAME = 'SeoulMMOD_Subdistrict_2024'
 regular_settings = get_regular_settings(DATA_NAME)
 INPUT_LEN = regular_settings['INPUT_LEN']
 OUTPUT_LEN = regular_settings['OUTPUT_LEN']
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
-MODEL_ARCH = TimeMixer
+MODEL_ARCH = iTransformer
 MODEL_PARAM = {
-    'enc_in': 6,
-    'dec_in': 6,
-    'c_out': 6,
-    'seq_len': INPUT_LEN,
-    'pred_len': OUTPUT_LEN,
-    'down_sampling_window': 2,
-    'down_sampling_layers': 3,
-    'top_k': 5,
-    'down_sampling_method': 'avg',
-    'channel_independence': False,
-    'd_model': 16,
-    'moving_avg': 25,
-    'e_layers': 3,
-    'd_ff': 32,
-    'dropout': 0.1,
-    'freq': 'h',
-    'use_norm': 0,
-    'decomp_method': 'moving_avg',
-    'embed': 'fixed',
+    "task_name": "forecast",
+    "enc_in": 6,
+    "dec_in": 6,
+    "c_out": 6,
+    "seq_len": INPUT_LEN,
+    "pred_len": OUTPUT_LEN,
+    "factor": 3,
+    "d_model": 512,
+    "n_heads": 8,
+    "e_layers": 3,
+    "d_ff": 512,
+    "dropout": 0.1,
+    "freq": "h",
+    "use_norm": True,
+    "output_attention": False,
+    "embed": "fixed",
+    "activation": "gelu",
 }
 NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'TimeMixer on SeoulMMOD_District_2024 (district-scale, per-OD-pair, 6 interacting modes as variates, all 625 pairs)'
+CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates, h=24)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
@@ -62,7 +60,7 @@ CFG.DATASET.PARAM = EasyDict({
     'input_len': INPUT_LEN,
     'output_len': OUTPUT_LEN,
     'n_modes': 6,
-    'node_sample_size': 0,
+    'node_sample_size': 10000,
 })
 
 ############################## Scaler Configuration ##############################
@@ -99,23 +97,23 @@ CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     'checkpoints',
     MODEL_ARCH.__name__,
-    '_'.join([DATA_NAME, 'allmode_2024', str(CFG.TRAIN.NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)])
+    '_'.join([DATA_NAME, str(CFG.TRAIN.NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)])
 )
 CFG.TRAIN.LOSS = masked_mae
 CFG.TRAIN.OPTIM = EasyDict()
-CFG.TRAIN.OPTIM.TYPE = 'Adam'
+CFG.TRAIN.OPTIM.TYPE = "Adam"
 CFG.TRAIN.OPTIM.PARAM = {
-    'lr': 0.001,
-    'weight_decay': 0.0001,
+    "lr": 0.0005,
+    "weight_decay": 0.0001,
 }
 CFG.TRAIN.LR_SCHEDULER = EasyDict()
-CFG.TRAIN.LR_SCHEDULER.TYPE = 'MultiStepLR'
+CFG.TRAIN.LR_SCHEDULER.TYPE = "MultiStepLR"
 CFG.TRAIN.LR_SCHEDULER.PARAM = {
-    'milestones': [1, 25, 50],
-    'gamma': 0.5,
+    "milestones": [1, 25, 50],
+    "gamma": 0.5
 }
 CFG.TRAIN.CLIP_GRAD_PARAM = {
-    'max_norm': 5.0,
+    'max_norm': 5.0
 }
 CFG.TRAIN.DATA = EasyDict()
 CFG.TRAIN.DATA.BATCH_SIZE = 256

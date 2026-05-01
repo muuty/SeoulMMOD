@@ -1,3 +1,8 @@
+"""STID on sub-district-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes).
+
+OOM test: STID uses node embeddings (N x embed_dim) without N x N attention,
+so memory should be manageable even at 181K nodes.
+"""
 import os
 import sys
 import numpy as np
@@ -12,8 +17,7 @@ from basicts.utils import get_regular_settings
 
 from .arch import STID
 
-############################## Hot Parameters ##############################
-DATA_NAME = 'SeoulMMOD_District_2024'
+DATA_NAME = 'SeoulMMOD_Subdistrict_2024'
 regular_settings = get_regular_settings(DATA_NAME)
 INPUT_LEN = regular_settings['INPUT_LEN']
 OUTPUT_LEN = regular_settings['OUTPUT_LEN']
@@ -21,10 +25,10 @@ TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
 MODEL_ARCH = STID
 MODEL_PARAM = {
-    "num_nodes": 625,
+    "num_nodes": 181476,
     "input_len": INPUT_LEN,
-    "input_dim": 6,           # 6 mode flows
-    "output_dim": 6,          # predict all 6 modes
+    "input_dim": 6,
+    "output_dim": 6,
     "embed_dim": 32,
     "output_len": OUTPUT_LEN,
     "num_layer": 3,
@@ -36,18 +40,16 @@ MODEL_PARAM = {
     "temp_dim_diw": 32,
     "time_of_day_size": 24,
     "day_of_week_size": 7,
-    "tod_index": 6,           # tod at channel 6 (after 6 flows)
-    "dow_index": 7,           # dow at channel 7
+    "tod_index": 6,
+    "dow_index": 7,
 }
 NUM_EPOCHS = 100
 
-############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'STID on SeoulMMOD_District_2024 all-mode (input_dim=6, output_dim=6, tod+dow)'
+CFG.DESCRIPTION = 'STID on SeoulMMOD_Subdistrict_2024 sub-district-scale (OOM probe, 181476 nodes, h=24)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
-############################## Dataset Configuration ##############################
 CFG.DATASET = EasyDict()
 CFG.DATASET.NAME = DATA_NAME
 CFG.DATASET.TYPE = TimeSeriesForecastingDataset
@@ -58,7 +60,6 @@ CFG.DATASET.PARAM = EasyDict({
     'output_len': OUTPUT_LEN,
 })
 
-############################## Scaler Configuration ##############################
 CFG.SCALER = EasyDict()
 CFG.SCALER.TYPE = ZScoreScaler
 CFG.SCALER.PARAM = EasyDict({
@@ -69,7 +70,6 @@ CFG.SCALER.PARAM = EasyDict({
     'target_channel': [0, 1, 2, 3, 4, 5],
 })
 
-############################## Model Configuration ##############################
 CFG.MODEL = EasyDict()
 CFG.MODEL.NAME = MODEL_ARCH.__name__
 CFG.MODEL.ARCH = MODEL_ARCH
@@ -77,13 +77,11 @@ CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5, 6, 7]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
 
-############################## Metrics Configuration ##############################
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse})
 CFG.METRICS.TARGET = 'MAE'
 CFG.METRICS.NULL_VAL = np.nan
 
-############################## Training Configuration ##############################
 CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
@@ -100,18 +98,24 @@ CFG.TRAIN.LR_SCHEDULER.TYPE = "MultiStepLR"
 CFG.TRAIN.LR_SCHEDULER.PARAM = {"milestones": [1, 50, 80], "gamma": 0.5}
 CFG.TRAIN.CLIP_GRAD_PARAM = {'max_norm': 5.0}
 CFG.TRAIN.DATA = EasyDict()
-CFG.TRAIN.DATA.BATCH_SIZE = 16
+CFG.TRAIN.DATA.BATCH_SIZE = 8
 CFG.TRAIN.DATA.SHUFFLE = True
+CFG.TRAIN.DATA.NUM_WORKERS = 16
+CFG.TRAIN.DATA.PIN_MEMORY = True
 
 CFG.VAL = EasyDict()
 CFG.VAL.INTERVAL = 1
 CFG.VAL.DATA = EasyDict()
-CFG.VAL.DATA.BATCH_SIZE = 16
+CFG.VAL.DATA.BATCH_SIZE = 8
+CFG.VAL.DATA.NUM_WORKERS = 16
+CFG.VAL.DATA.PIN_MEMORY = True
 
 CFG.TEST = EasyDict()
 CFG.TEST.INTERVAL = 1
 CFG.TEST.DATA = EasyDict()
-CFG.TEST.DATA.BATCH_SIZE = 16
+CFG.TEST.DATA.BATCH_SIZE = 8
+CFG.TEST.DATA.NUM_WORKERS = 16
+CFG.TEST.DATA.PIN_MEMORY = True
 
 CFG.EVAL = EasyDict()
 CFG.EVAL.USE_GPU = True

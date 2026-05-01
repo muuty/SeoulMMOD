@@ -21,7 +21,7 @@ datasets/
 
 The dataset release is distributed separately from this code repository.
 Configuration files load datasets by directory name. For example,
-`baselines/STAEformer/SeoulMMOD_District_2024_allmode.py` expects
+`baselines/STAEformer/SeoulMMOD_District_2024_allmode_h24.py` expects
 `datasets/SeoulMMOD_District_2024/`.
 
 If processed parquet files are available, build the base datasets from the

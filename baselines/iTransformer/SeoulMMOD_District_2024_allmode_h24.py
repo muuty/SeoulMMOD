@@ -12,41 +12,41 @@ from basicts.utils import get_regular_settings
 
 from basicts.scaler import SeoulMMODGlobalZScoreScaler
 
-from .arch import SOFTS
+from .arch import iTransformer
 
 ############################## Hot Parameters ##############################
+# Dataset & Metrics configuration
 DATA_NAME = 'SeoulMMOD_District_2024'
 regular_settings = get_regular_settings(DATA_NAME)
 INPUT_LEN = regular_settings['INPUT_LEN']
 OUTPUT_LEN = regular_settings['OUTPUT_LEN']
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
-MODEL_ARCH = SOFTS
+MODEL_ARCH = iTransformer
 MODEL_PARAM = {
-    # SOFTS interacts across the 6 transport modes through the variate axis.
-    # `task_name` is not used in this implementation; `enc_in` is kept for
-    # interface consistency with other multivariate baselines.
+    "task_name": "forecast",
     "enc_in": 6,
     "dec_in": 6,
     "c_out": 6,
     "seq_len": INPUT_LEN,
     "pred_len": OUTPUT_LEN,
-    "e_layers": 2,
-    "d_model": 128,
-    "d_core": 64,
-    "d_ff": 128,
-    "dropout": 0.0,
+    "factor": 3,
+    "d_model": 512,
+    "n_heads": 8,
+    "e_layers": 3,
+    "d_ff": 512,
+    "dropout": 0.1,
+    "freq": "h",
     "use_norm": True,
+    "output_attention": False,
+    "embed": "fixed",
     "activation": "gelu",
-    # ODPairDataset only returns the 6 mode-flow channel, so SOFTS must run
-    # without external temporal covariates on this benchmark.
-    "time_of_day_size": None,
 }
 NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'SOFTS on SeoulMMOD_District_2024 (district-scale, per-OD-pair, 6 interacting modes as variates, all 625 pairs)'
+CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_District_2024 (district-scale, per-OD-pair, 6 interacting modes as variates, all 625 pairs, h=24)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
@@ -103,17 +103,17 @@ CFG.TRAIN.LOSS = masked_mae
 CFG.TRAIN.OPTIM = EasyDict()
 CFG.TRAIN.OPTIM.TYPE = "Adam"
 CFG.TRAIN.OPTIM.PARAM = {
-    "lr": 0.0003,
+    "lr": 0.0005,
     "weight_decay": 0.0001,
 }
 CFG.TRAIN.LR_SCHEDULER = EasyDict()
 CFG.TRAIN.LR_SCHEDULER.TYPE = "MultiStepLR"
 CFG.TRAIN.LR_SCHEDULER.PARAM = {
     "milestones": [1, 25, 50],
-    "gamma": 0.5,
+    "gamma": 0.5
 }
 CFG.TRAIN.CLIP_GRAD_PARAM = {
-    'max_norm': 5.0,
+    'max_norm': 5.0
 }
 CFG.TRAIN.DATA = EasyDict()
 CFG.TRAIN.DATA.BATCH_SIZE = 256

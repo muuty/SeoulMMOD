@@ -23,14 +23,6 @@ pip install -r requirements.txt
 
 ## Data
 
-Place processed datasets under `datasets/`.
-
-```text
-datasets/
-  SeoulMMOD_District_2024/
-  SeoulMMOD_Subdistrict_2024/
-```
-
 To build BasicTS datasets from released parquet files:
 
 ```bash
@@ -43,11 +35,19 @@ python scripts/data_preparation/build_basicts_dataset.py \
 
 Use `--level subdistrict` for the subdistrict-scale dataset.
 
+Processed datasets are placed under `datasets/`.
+
+```text
+datasets/
+  SeoulMMOD_District_2024/
+  SeoulMMOD_Subdistrict_2024/
+```
+
 ## Training
 
 ```bash
 python experiments/train.py \
-  -c baselines/STAEformer/SeoulMMOD_District_2024_allmode.py \
+  -c baselines/STAEformer/SeoulMMOD_District_2024_allmode_h24.py \
   -g 0
 ```
 

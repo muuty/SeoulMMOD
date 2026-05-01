@@ -1,3 +1,8 @@
+"""AGCRN on sub-district-scale SeoulMMOD_Subdistrict_2024 (all-mode joint, 181476 nodes, h=6).
+
+OOM test: AGCRN builds adaptive adjacency (N, N) via node embeddings; the
+cheb graph conv at N=181476 is the expected OOM bottleneck.
+"""
 import os
 import sys
 
@@ -14,20 +19,18 @@ from basicts.utils import get_regular_settings
 
 from .arch import AGCRN
 
-############################## Hot Parameters ##############################
-# AGCRN does not use tod/dow embeddings, so we only forward the 6 flow channels.
-DATA_NAME = 'SeoulMMOD_District_2024'
+DATA_NAME = 'SeoulMMOD_Subdistrict_2024'
 regular_settings = get_regular_settings(DATA_NAME)
-INPUT_LEN = regular_settings['INPUT_LEN']
-OUTPUT_LEN = regular_settings['OUTPUT_LEN']
+INPUT_LEN = 6
+OUTPUT_LEN = 6
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']
 
 MODEL_ARCH = AGCRN
 MODEL_PARAM = {
-    'num_nodes': 625,
-    'input_dim': 6,           # 6 mode flows as input
+    'num_nodes': 181476,
+    'input_dim': 6,
     'rnn_units': 64,
-    'output_dim': 6,          # predict all 6 modes
+    'output_dim': 6,
     'horizon': OUTPUT_LEN,
     'num_layers': 2,
     'default_graph': True,
@@ -35,15 +38,13 @@ MODEL_PARAM = {
     'cheb_k': 2,
 }
 NUM_EPOCHS = 100
-BATCH_SIZE = 32
+BATCH_SIZE = 1
 
-############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'AGCRN on SeoulMMOD_District_2024 (all-mode, input_dim=6, output_dim=6)'
+CFG.DESCRIPTION = 'AGCRN on SeoulMMOD_Subdistrict_2024 sub-district-scale (OOM probe, 181476 nodes, h=6)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
-############################## Dataset Configuration ##############################
 CFG.DATASET = EasyDict()
 CFG.DATASET.NAME = DATA_NAME
 CFG.DATASET.TYPE = TimeSeriesForecastingDataset
@@ -54,7 +55,6 @@ CFG.DATASET.PARAM = EasyDict({
     'output_len': OUTPUT_LEN,
 })
 
-############################## Scaler Configuration ##############################
 CFG.SCALER = EasyDict()
 CFG.SCALER.TYPE = ZScoreScaler
 CFG.SCALER.PARAM = EasyDict({
@@ -62,18 +62,16 @@ CFG.SCALER.PARAM = EasyDict({
     'train_ratio': TRAIN_VAL_TEST_RATIO[0],
     'norm_each_channel': False,
     'rescale': True,
-    'target_channel': [0, 1, 2, 3, 4, 5],  # normalize all 6 flow channels
+    'target_channel': [0, 1, 2, 3, 4, 5],
 })
 
-############################## Model Configuration ##############################
 CFG.MODEL = EasyDict()
 CFG.MODEL.NAME = MODEL_ARCH.__name__
 CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
-CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]  # AGCRN doesn't use tod/dow
-CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]    # predict all 6 modes
+CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]
+CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
 
-############################## Metrics Configuration ##############################
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({
     'MAE': masked_mae,
@@ -82,7 +80,6 @@ CFG.METRICS.FUNCS = EasyDict({
 CFG.METRICS.TARGET = 'MAE'
 CFG.METRICS.NULL_VAL = np.nan
 
-############################## Training Configuration ##############################
 CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
@@ -100,18 +97,15 @@ CFG.TRAIN.DATA = EasyDict()
 CFG.TRAIN.DATA.BATCH_SIZE = BATCH_SIZE
 CFG.TRAIN.DATA.SHUFFLE = True
 
-############################## Validation Configuration ##############################
 CFG.VAL = EasyDict()
 CFG.VAL.INTERVAL = 1
 CFG.VAL.DATA = EasyDict()
 CFG.VAL.DATA.BATCH_SIZE = BATCH_SIZE
 
-############################## Test Configuration ##############################
 CFG.TEST = EasyDict()
 CFG.TEST.INTERVAL = 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = BATCH_SIZE
 
-############################## Evaluation Configuration ##############################
 CFG.EVAL = EasyDict()
 CFG.EVAL.USE_GPU = True

@@ -48,7 +48,7 @@ NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
-CFG.DESCRIPTION = 'TimeMixer on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates)'
+CFG.DESCRIPTION = 'TimeMixer on SeoulMMOD_Subdistrict_2024 (per-OD-pair, 6 interacting modes as variates, h=24)'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
