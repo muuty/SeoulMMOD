@@ -15,7 +15,6 @@ from basicts.utils import get_regular_settings
 from .arch import AGCRN
 
 ############################## Hot Parameters ##############################
-# Full 8-channel dataset: [subway, metro_bus, local_bus, walk, car, other, tod, dow]
 # AGCRN does not use tod/dow embeddings, so we only forward the 6 flow channels.
 DATA_NAME = 'SeoulMMOD_District_2024'
 regular_settings = get_regular_settings(DATA_NAME)

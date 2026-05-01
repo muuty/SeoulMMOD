@@ -41,7 +41,7 @@ MODEL_PARAM = {
 NUM_EPOCHS = 100
 
 CFG = EasyDict()
-CFG.DESCRIPTION = 'STID on SeoulMMOD_District_2024_m4 mode-sep (car)'
+CFG.DESCRIPTION = 'STID on SeoulMMOD_District_2024_m4 mode-sep'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

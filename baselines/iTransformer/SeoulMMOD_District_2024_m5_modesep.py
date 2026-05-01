@@ -43,7 +43,7 @@ MODEL_PARAM = {
 NUM_EPOCHS = 100
 
 CFG = EasyDict()
-CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_District_2024_m5 mode-sep (other)'
+CFG.DESCRIPTION = 'iTransformer on SeoulMMOD_District_2024_m5 mode-sep'
 CFG.GPU_NUM = 1
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 

@@ -14,7 +14,6 @@ from basicts.utils import get_regular_settings
 from .arch import STAEformer
 
 ############################## Hot Parameters ##############################
-# Full 8-channel dataset: [subway, metro_bus, local_bus, walk, car, other, tod, dow]
 # Predict all 6 modes jointly; use tod/dow as temporal embeddings.
 DATA_NAME = 'SeoulMMOD_District_2024'
 regular_settings = get_regular_settings(DATA_NAME)
