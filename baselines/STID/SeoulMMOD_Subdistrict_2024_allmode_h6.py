@@ -9,7 +9,7 @@ import numpy as np
 from easydict import EasyDict
 sys.path.append(os.path.abspath(__file__ + '/../../..'))
 
-from basicts.metrics import masked_mae, masked_rmse, unmasked_wape
+from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.data import TimeSeriesForecastingDataset
 from basicts.runners import SimpleTimeSeriesForecastingRunner
 from basicts.scaler import ZScoreScaler
@@ -78,7 +78,7 @@ CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5, 6, 7]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
 
 CFG.METRICS = EasyDict()
-CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse, 'WAPE': unmasked_wape})
+CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse, 'wMAPE': unmasked_wmape})
 CFG.METRICS.TARGET = 'MAE'
 CFG.METRICS.NULL_VAL = np.nan
 

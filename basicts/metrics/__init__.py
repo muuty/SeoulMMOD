@@ -9,7 +9,7 @@ from .r_square import masked_r2
 from .rmse import masked_rmse
 from .smape import masked_smape
 from .wape import masked_wape
-from .unmasked_wape import unmasked_wape
+from .unmasked_wmape import unmasked_wmape
 
 ALL_METRICS = {
             'MAE': masked_mae,
@@ -17,7 +17,7 @@ ALL_METRICS = {
             'RMSE': masked_rmse,
             'MAPE': masked_mape,
             'WAPE': masked_wape,
-            'WAPE_global': unmasked_wape,
+            'wMAPE': unmasked_wmape,
             'SMAPE': masked_smape,
             'R2': masked_r2,
             'CORR': masked_corr,
@@ -37,7 +37,7 @@ __all__ = [
     'incremental_masked_rmse',
     'masked_mape',
     'masked_wape',
-    'unmasked_wape',
+    'unmasked_wmape',
     'masked_smape',
     'masked_r2',
     'masked_corr',

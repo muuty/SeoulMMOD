@@ -6,7 +6,7 @@ from easydict import EasyDict
 sys.path.append(os.path.abspath(__file__ + '/../../..'))
 
 from basicts.data import ODPairDataset
-from basicts.metrics import masked_mae, masked_rmse, unmasked_wape
+from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import SimpleTimeSeriesForecastingRunner
 from basicts.utils import get_regular_settings
 
@@ -86,7 +86,7 @@ CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({
     'MAE': masked_mae,
     'RMSE': masked_rmse,
-    'WAPE': unmasked_wape,
+    'wMAPE': unmasked_wmape,
 })
 CFG.METRICS.TARGET = 'MAE'
 CFG.METRICS.NULL_VAL = np.nan

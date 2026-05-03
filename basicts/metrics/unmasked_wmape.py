@@ -2,10 +2,10 @@ import numpy as np
 import torch
 
 
-def unmasked_wape(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
+def unmasked_wmape(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
     """Per-batch global WAPE = sum(|prediction - target|) / sum(|target|).
 
-    Differs from `masked_wape` in two ways:
+    Differs from `masked_wape` (the BasicTS upstream metric) in two ways:
       1. No null masking. All elements (including zeros) contribute.
       2. Sums over the entire batch tensor at once instead of computing a
          per-row WAPE and then averaging. This matches the WAPE definition
