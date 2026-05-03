@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../.."))
 
 from basicts.scaler import SeoulMMODGlobalZScoreScaler
 from basicts.data import ODPairDataset
-from basicts.metrics import masked_mae, masked_rmse
+from basicts.metrics import masked_mae, masked_rmse, unmasked_wape
 from basicts.runners import SimpleTimeSeriesForecastingRunner
 from basicts.utils import get_regular_settings
 
@@ -56,7 +56,6 @@ CFG.DATASET.PARAM = EasyDict({
     "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
     "n_modes": 6,
-    "node_sample_size": 10000,
 })
 
 ############################## Scaler Configuration ##############################
@@ -83,6 +82,7 @@ CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({
     "MAE": masked_mae,
     "RMSE": masked_rmse,
+    "WAPE": unmasked_wape,
 })
 CFG.METRICS.TARGET = "MAE"
 CFG.METRICS.NULL_VAL = np.nan

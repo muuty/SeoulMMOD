@@ -6,7 +6,7 @@ import os
 import numpy as np
 from easydict import EasyDict
 
-from basicts.metrics import masked_mae, masked_rmse
+from basicts.metrics import masked_mae, masked_rmse, unmasked_wape
 from basicts.data import TimeSeriesForecastingDataset
 from basicts.runners import SimpleTimeSeriesForecastingRunner
 from basicts.scaler import ZScoreScaler
@@ -61,7 +61,7 @@ def build_config(dataset_name: str, num_nodes: int,
     CFG.MODEL.TARGET_FEATURES = list(range(num_modes))
 
     CFG.METRICS = EasyDict()
-    CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse})
+    CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse, 'WAPE': unmasked_wape})
     CFG.METRICS.TARGET = 'MAE'
     CFG.METRICS.NULL_VAL = np.nan
 
