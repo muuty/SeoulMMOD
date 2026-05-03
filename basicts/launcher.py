@@ -63,7 +63,7 @@ def evaluation_func(cfg: Dict,
             runner.load_model(ckpt_path=ckpt_path, strict=strict)
 
         # start the evaluation pipeline
-        runner.test_pipeline(cfg=cfg, save_metrics=True, save_results=True)
+        runner.test_pipeline(cfg=cfg, save_metrics=True, save_results=False)
 
     except BaseException as e:
         # log the exception and re-raise it

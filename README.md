@@ -74,6 +74,14 @@ Use another config under `baselines/` for a different model.
 
 ## OD Baselines
 
+OD-native baselines (MPGCN, ODCRN, ODMixer) are not integrated into the BasicTS
+training loop used above. Their original implementations expect full OD
+matrices `[T, N, N, C]` rather than node-feature time series, so we run them
+through a separate launcher. The launcher loads the same BasicTS dataset
+(`data.dat` memmap + `desc.json`) produced by `build_basicts_dataset.py`,
+reshapes it to the OD-matrix layout, and reports metrics comparable to the
+BasicTS-based models.
+
 ```bash
 python scripts/run_od_native.py \
   --model odmixer \
