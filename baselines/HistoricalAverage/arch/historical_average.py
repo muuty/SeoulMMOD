@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-from os import PathLike
-from pathlib import Path
 from typing import Sequence
 
 import numpy as np
@@ -17,8 +15,8 @@ class HistoricalAverage(nn.Module):
     def __init__(
         self,
         dataset_name: str,
-        data_path: str | PathLike[str],
-        desc_path: str | PathLike[str],
+        data_path: str,
+        desc_path: str,
         num_nodes: int,
         input_len: int,
         output_len: int,
@@ -35,8 +33,6 @@ class HistoricalAverage(nn.Module):
         self.tod_index = tod_index
         self.dow_index = dow_index
 
-        data_path = Path(data_path)
-        desc_path = Path(desc_path)
         with open(desc_path) as f:
             desc = json.load(f)
         T_total, N_pairs, F_total = tuple(desc['shape'])
