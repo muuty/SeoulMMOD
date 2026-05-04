@@ -5,9 +5,14 @@ from typing import Dict, Optional
 
 import torch
 from easytorch.core.checkpoint import save_ckpt
+from easytorch.utils import master_only
 from torch.nn.parallel import DistributedDataParallel as DDP
+from tqdm import tqdm
 
 from .runner_zoo.simple_tsf_runner import SimpleTimeSeriesForecastingRunner
+
+
+MODE_NAMES = ("metro_bus", "local_bus", "subway", "walk", "car", "other")
 
 
 class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
@@ -20,6 +25,13 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
         self.num_pairs = tuple(desc["shape"])[1]
         self.num_od_nodes = int(math.sqrt(self.num_pairs))
         self.clip_prediction = cfg["MODEL"].get("CLIP_PREDICTION", False)
+        self.mode_names = tuple(cfg["MODEL"].get("MODE_NAMES", MODE_NAMES))
+
+    def init_test(self, cfg: Dict):
+        super().init_test(cfg)
+        for mode in self.mode_names:
+            for key in self.metrics:
+                self.register_epoch_meter(f"test/{key}@{mode}", f"test @ {mode}", "{:.4f}")
 
     def preprocessing(self, input_data: Dict) -> Dict:
         input_data = super().preprocessing(input_data)
@@ -111,6 +123,71 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
         if self.clip_prediction and not train and "prediction" in model_return:
             model_return["prediction"] = model_return["prediction"].clamp_min(0)
         return model_return
+
+    @torch.no_grad()
+    @master_only
+    def test(self, train_epoch: Optional[int] = None, save_metrics: bool = False, save_results: bool = False) -> Dict:
+        for batch_idx, data in enumerate(tqdm(self.test_data_loader)):
+            forward_return = self.forward(data, epoch=None, iter_num=None, train=False)
+
+            loss = self.metric_forward(self.loss, forward_return)
+            weight = self._get_metric_weight(forward_return["target"])
+            self.update_epoch_meter("test/loss", loss.item(), weight)
+
+            if not self.if_evaluate_on_gpu:
+                pred = forward_return["prediction"].detach().cpu()
+                target = forward_return["target"].detach().cpu()
+            else:
+                pred = forward_return["prediction"]
+                target = forward_return["target"]
+
+            if save_results:
+                batch_data = {
+                    "prediction": forward_return["prediction"].detach().cpu().numpy(),
+                    "target": forward_return["target"].detach().cpu().numpy(),
+                    "inputs": forward_return["inputs"].detach().cpu().numpy(),
+                }
+                self._save_test_results(batch_idx, batch_data)
+
+            for i in self.evaluation_horizons:
+                pred_h = pred[:, i, :, :]
+                target_h = target[:, i, :, :]
+                weight_h = self._get_metric_weight(target_h)
+
+                for metric_name, metric_func in self.metrics.items():
+                    if metric_name.lower() == "mase":
+                        continue
+                    metric_val = self.metric_forward(metric_func, {"prediction": pred_h, "target": target_h})
+                    self.update_epoch_meter(f"test/{metric_name}@h{i+1}", metric_val.item(), weight_h)
+
+            for metric_name, metric_func in self.metrics.items():
+                metric_item = self.metric_forward(metric_func, {"prediction": pred, "target": target})
+                self.update_epoch_meter(f"test/{metric_name}", metric_item.item(), weight)
+
+            for mode_idx, mode in enumerate(self.mode_names):
+                if mode_idx >= pred.shape[-1]:
+                    break
+                pred_m = pred[..., mode_idx:mode_idx + 1]
+                target_m = target[..., mode_idx:mode_idx + 1]
+                weight_m = self._get_metric_weight(target_m)
+                for metric_name, metric_func in self.metrics.items():
+                    metric_item = self.metric_forward(metric_func, {"prediction": pred_m, "target": target_m})
+                    self.update_epoch_meter(f"test/{metric_name}@{mode}", metric_item.item(), weight_m)
+
+        if save_metrics:
+            metrics_results = {
+                "overall": {k: self.meter_pool.get_value(f"test/{k}") for k in self.metrics.keys()},
+                "per_mode": {
+                    mode: {k: self.meter_pool.get_value(f"test/{k}@{mode}") for k in self.metrics.keys()}
+                    for mode in self.mode_names
+                },
+            }
+            for i in self.evaluation_horizons:
+                metrics_results[f"horizon_{i+1}"] = {
+                    k: self.meter_pool.get_value(f"test/{k}@h{i+1}") for k in self.metrics.keys()
+                }
+            with open(os.path.join(self.ckpt_save_dir, "test_metrics.json"), "w") as f:
+                json.dump(metrics_results, f, indent=4)
 
     def save_best_model(self, epoch: int, metric_name: str, greater_best: bool = True):
         metric = self.meter_pool.get_value(metric_name)
