@@ -4,6 +4,8 @@ import os
 from typing import Dict, Optional
 
 import torch
+from easytorch.core.checkpoint import save_ckpt
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 from .runner_zoo.simple_tsf_runner import SimpleTimeSeriesForecastingRunner
 
@@ -17,9 +19,7 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
             desc = json.load(f)
         self.num_pairs = tuple(desc["shape"])[1]
         self.num_od_nodes = int(math.sqrt(self.num_pairs))
-        if self.num_od_nodes * self.num_od_nodes != self.num_pairs:
-            raise ValueError(f"OD-native models require square OD pairs, got {self.num_pairs}")
-        self.train_val_horizon = cfg["MODEL"].get("TRAIN_VAL_HORIZON", None)
+        self.clip_prediction = cfg["MODEL"].get("CLIP_PREDICTION", False)
 
     def preprocessing(self, input_data: Dict) -> Dict:
         input_data = super().preprocessing(input_data)
@@ -38,15 +38,11 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
         return input_data
 
     def _to_matrix(self, data: torch.Tensor) -> torch.Tensor:
-        batch, length, num_pairs, channels = data.shape
-        if num_pairs != self.num_pairs:
-            raise ValueError(f"Expected {self.num_pairs} OD pairs, got {num_pairs}")
+        batch, length, _, channels = data.shape
         return data.reshape(batch, length, self.num_od_nodes, self.num_od_nodes, channels)
 
     def _to_pairs(self, data: torch.Tensor) -> torch.Tensor:
-        batch, length, n_origin, n_dest, channels = data.shape
-        if n_origin != self.num_od_nodes or n_dest != self.num_od_nodes:
-            raise ValueError(f"Expected OD matrix {self.num_od_nodes}x{self.num_od_nodes}, got {n_origin}x{n_dest}")
+        batch, length, _, _, channels = data.shape
         return data.reshape(batch, length, self.num_pairs, channels)
 
     def forward(self, data: Dict, epoch: Optional[int] = None,
@@ -66,8 +62,6 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
         time_index = data.get("time_index")
         if time_index is not None:
             time_index = self.to_running_device(time_index)
-
-        batch_size, length, num_pairs, _ = future_data.shape
 
         history_target = self.select_target_features(history_data)
         future_target = self.select_target_features(future_data)
@@ -100,34 +94,41 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
         prediction = model_return["prediction"]
         if prediction.ndim == 5:
             prediction = self._to_pairs(prediction)
-        elif prediction.ndim != 4:
-            raise ValueError(f"Unexpected OD-native prediction shape: {prediction.shape}")
 
         if "prev_prediction" in model_return:
             prev_prediction = model_return["prev_prediction"]
             if prev_prediction.ndim == 5:
                 prev_prediction = self._to_pairs(prev_prediction)
-            elif prev_prediction.ndim != 4:
-                raise ValueError(f"Unexpected OD-native prev_prediction shape: {prev_prediction.shape}")
             model_return["prev_prediction"] = prev_prediction
             if prev_future_target is not None:
                 model_return["prev_target"] = prev_future_target
-
-        if self.train_val_horizon is not None and (train or iter_num is not None):
-            horizon = min(self.train_val_horizon, prediction.shape[1])
-            prediction = prediction[:, :horizon]
-            future_target = future_target[:, :horizon]
-            if "prev_prediction" in model_return:
-                model_return["prev_prediction"] = model_return["prev_prediction"][:, :horizon]
-            if "prev_target" in model_return:
-                model_return["prev_target"] = model_return["prev_target"][:, :horizon]
-            length = horizon
 
         model_return["prediction"] = prediction
         model_return["inputs"] = history_target
         model_return["target"] = future_target
 
-        assert list(prediction.shape)[:3] == [batch_size, length, num_pairs], \
-            "OD-native prediction must flatten back to [B, L, N_pairs, C]."
+        model_return = self.postprocessing(model_return)
+        if self.clip_prediction and not train and "prediction" in model_return:
+            model_return["prediction"] = model_return["prediction"].clamp_min(0)
+        return model_return
 
-        return self.postprocessing(model_return)
+    def save_best_model(self, epoch: int, metric_name: str, greater_best: bool = True):
+        metric = self.meter_pool.get_value(metric_name)
+        best_metric = self.best_metrics.get(metric_name)
+        if best_metric is None or (metric > best_metric if greater_best else metric < best_metric):
+            self.best_metrics[metric_name] = metric
+            model = self.model.module if isinstance(self.model, DDP) else self.model
+            ckpt_dict = {
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "optim_state_dict": self.optim.state_dict(),
+                "best_metrics": self.best_metrics,
+            }
+            ckpt_path = os.path.join(
+                self.ckpt_save_dir,
+                "{}_best_{}.pt".format(self.model_name, metric_name.replace("/", "_")),
+            )
+            save_ckpt(ckpt_dict, ckpt_path, self.logger)
+            self.current_patience = self.early_stopping_patience
+        elif self.early_stopping_patience is not None:
+            self.current_patience -= 1

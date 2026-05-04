@@ -12,6 +12,9 @@ checkpoints/
 logs/
 benchmark_runs/
 runs/
+/figures/
+run_logs/
+od_references/
 
 *.dat
 *.npy

@@ -9,9 +9,9 @@ sys.path.append(os.path.abspath(__file__ + "/../../.."))
 from basicts.data import ODMatrixDataset
 from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
-from basicts.scaler import Log1pScaler
+from basicts.scaler import Log1pZScoreScaler
 
-from .arch import MPGCNAdapter
+from .adapter import MPGCNAdapter
 
 
 DATA_NAME = "SeoulMMOD_District_2024"
@@ -27,12 +27,16 @@ MODEL_PARAM = {
     "input_dim": 6,
     "output_dim": 6,
     "output_len": OUTPUT_LEN,
+    "input_len": INPUT_LEN,
     "hidden_dim": 32,
     "K_cheby": 2,
+    "adj_path": os.path.join("datasets", DATA_NAME, "adj_matrix.npy"),
     "data_path": os.path.join("datasets", DATA_NAME, "data.dat"),
     "desc_path": os.path.join("datasets", DATA_NAME, "desc.json"),
     "train_ratio": TRAIN_VAL_TEST_RATIO[0],
     "period": 24,
+    "static_graph_type": "uniform",
+    "dynamic_graph_type": "similarity",
 }
 
 CFG = EasyDict()
@@ -52,13 +56,15 @@ CFG.DATASET.PARAM = EasyDict({
 })
 
 CFG.SCALER = EasyDict()
-CFG.SCALER.TYPE = Log1pScaler
+CFG.SCALER.TYPE = Log1pZScoreScaler
 CFG.SCALER.PARAM = EasyDict({
     "dataset_name": DATA_NAME,
     "train_ratio": TRAIN_VAL_TEST_RATIO[0],
     "norm_each_channel": False,
     "rescale": True,
     "target_channel": [0, 1, 2, 3, 4, 5],
+    "input_len": INPUT_LEN,
+    "output_len": OUTPUT_LEN,
 })
 
 CFG.MODEL = EasyDict()
@@ -67,7 +73,7 @@ CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
-CFG.MODEL.TRAIN_VAL_HORIZON = 1
+CFG.MODEL.CLIP_PREDICTION = True
 
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({"MAE": masked_mae, "RMSE": masked_rmse, "wMAPE": unmasked_wmape})
@@ -97,7 +103,7 @@ CFG.VAL.DATA = EasyDict()
 CFG.VAL.DATA.BATCH_SIZE = BATCH_SIZE
 
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = 1
+CFG.TEST.INTERVAL = NUM_EPOCHS + 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = BATCH_SIZE
 

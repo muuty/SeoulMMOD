@@ -15,6 +15,10 @@ pandas
 duckdb
 scipy
 scikit-learn
+matplotlib
+seaborn
+geopandas
+networkx
 
 # Architecture helpers
 einops

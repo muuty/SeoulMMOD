@@ -1,3 +1,3 @@
-from .mpgcn_arch import MPGCNAdapter
+from .mpgcn_arch import BDGCN, MPGCNCore
 
-__all__ = ["MPGCNAdapter"]
+__all__ = ["BDGCN", "MPGCNCore"]

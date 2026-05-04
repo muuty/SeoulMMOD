@@ -54,9 +54,6 @@ def main():
     dataset.t_start = 0
     dataset.t_end = dataset.total_time
     dataset.n_time_samples = dataset.t_end - dataset.t_start - dataset.input_len - dataset.output_len + 1
-    # Re-sample for full-time coverage
-    if dataset._sampled_pairs is not None:
-        dataset._sampled_times = np.random.choice(dataset.n_time_samples, dataset.node_sample_size, replace=True)
     loader = DataLoader(dataset, batch_size=cfg.TEST.DATA.BATCH_SIZE, shuffle=False, num_workers=2)
 
     # Model + checkpoint (2024 weights)

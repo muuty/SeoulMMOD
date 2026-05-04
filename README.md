@@ -27,8 +27,7 @@ baselines/       BasicTS baseline configs and model code
 basicts/         BasicTS framework code used in the benchmark
 datasets/        downloaded data and generated BasicTS datasets
 experiments/     training and evaluation scripts
-od_baselines/    MPGCN, ODCRN, and ODMixer source code
-scripts/         data builders and OD baseline runner
+scripts/         data builders and utility scripts
 ```
 
 ## Installation
@@ -71,27 +70,6 @@ python experiments/train.py \
 ```
 
 Use another config under `baselines/` for a different model.
-
-## OD Baselines
-
-OD-native baselines (MPGCN, ODCRN, ODMixer) are not integrated into the BasicTS
-training loop used above. Their original implementations expect full OD
-matrices `[T, N, N, C]` rather than node-feature time series, so we run them
-through a separate launcher. The launcher loads the same BasicTS dataset
-(`data.dat` memmap + `desc.json`) produced by `build_basicts_dataset.py`,
-reshapes it to the OD-matrix layout, and reports metrics comparable to the
-BasicTS-based models.
-
-```bash
-python scripts/run_od_native.py \
-  --model odmixer \
-  --level district \
-  --horizon 24 \
-  --data_dir datasets/SeoulMMOD_District_2024 \
-  --gpu 0
-```
-
-`--model` supports `mpgcn`, `odcrn`, and `odmixer`.
 
 ## Context
 

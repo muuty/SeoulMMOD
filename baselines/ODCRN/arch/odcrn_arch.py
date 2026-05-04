@@ -4,31 +4,6 @@ import torch
 from torch import nn
 
 
-def random_walk_supports(adj: torch.Tensor, order: int) -> torch.Tensor:
-    if adj.ndim == 2:
-        adj = adj.unsqueeze(0)
-        squeeze = True
-    else:
-        squeeze = False
-    adj = adj.float()
-    row_sum = adj.sum(dim=-1, keepdim=True).clamp_min(1e-8)
-    x = (adj / row_sum).transpose(-1, -2)
-    eye = torch.eye(adj.shape[-1], dtype=adj.dtype, device=adj.device)
-    eye = eye.expand(adj.shape[0], -1, -1)
-    supports = [eye]
-    if order >= 1:
-        supports.append(x)
-    for k in range(2, order + 1):
-        supports.append(2 * torch.matmul(x, supports[k - 1]) - supports[k - 2])
-    out = torch.stack(supports, dim=1)
-    return out.squeeze(0) if squeeze else out
-
-
-def uniform_static_supports(num_nodes: int, order: int) -> torch.Tensor:
-    adj = torch.ones(num_nodes, num_nodes, dtype=torch.float32) / num_nodes
-    return random_walk_supports(adj, order)
-
-
 class ODconv(nn.Module):
     def __init__(self, K: int, input_dim: int, hidden_dim: int,
                  use_bias: bool = True, activation=None) -> None:
@@ -240,38 +215,3 @@ class ODCRN(nn.Module):
             deco_input = output
             outputs.append(output)
         return torch.stack(outputs, dim=1)
-
-
-class ODCRNAdapter(nn.Module):
-    def __init__(
-        self,
-        num_nodes: int,
-        input_dim: int,
-        output_dim: int,
-        output_len: int,
-        hidden_dim: int = 32,
-        K_cheby: int = 2,
-        num_layers: int = 2,
-        dgc: bool = True,
-    ) -> None:
-        super().__init__()
-        if output_dim != input_dim:
-            raise ValueError("ODCRNAdapter requires output_dim == input_dim")
-        if num_layers != 2:
-            raise ValueError("ODCRNAdapter follows the original two-graph setup and requires num_layers=2")
-        self.register_buffer("static_graph", uniform_static_supports(num_nodes, K_cheby))
-        self.model = ODCRN(
-            num_nodes=num_nodes,
-            K=K_cheby + 1,
-            input_dim=input_dim,
-            hidden_dim=hidden_dim,
-            out_horizon=output_len,
-            num_layers=num_layers,
-            DGCbool=dgc,
-            use_bias=True,
-            activation=None,
-        )
-
-    def forward(self, history_data: torch.Tensor, future_data: torch.Tensor,
-                batch_seen: int, epoch: int, train: bool, **kwargs) -> torch.Tensor:
-        return self.model(G=self.static_graph, X_seq=history_data)

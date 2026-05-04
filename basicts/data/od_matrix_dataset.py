@@ -30,8 +30,10 @@ class ODMatrixDataset(TimeSeriesForecastingDataset):
         self.num_od_nodes = num_od_nodes
         self.time_offset = self._time_offset()
         self.prev_period = prev_period
+        self.sample_offset = 0
         self.full_data = None
         if self.prev_period is not None:
+            self.sample_offset = max(self.prev_period - self.time_offset, 0)
             self.full_data = np.memmap(
                 self.data_file_path,
                 dtype="float32",
@@ -53,23 +55,18 @@ class ODMatrixDataset(TimeSeriesForecastingDataset):
         return train_len + valid_len - offset_left
 
     def __getitem__(self, index: int) -> dict:
-        item = super().__getitem__(index)
-        item["time_index"] = np.int64(self.time_offset + index + self.input_len - 1)
+        sample_index = index + self.sample_offset
+        item = super().__getitem__(sample_index)
+        item["time_index"] = np.int64(self.time_offset + sample_index + self.input_len - 1)
         if self.prev_period is not None:
-            history_start = self.time_offset + index - self.prev_period
+            history_start = self.time_offset + sample_index - self.prev_period
             target_start = history_start + self.input_len
             item["prev_inputs"] = self._full_slice(history_start, self.input_len)
             item["prev_target"] = self._full_slice(target_start, self.output_len)
         return item
 
+    def __len__(self) -> int:
+        return super().__len__() - self.sample_offset
+
     def _full_slice(self, start: int, length: int) -> np.ndarray:
-        shape = (length,) + tuple(self.description["shape"][1:])
-        out = np.zeros(shape, dtype=np.float32)
-        total_len = tuple(self.description["shape"])[0]
-        src_start = max(start, 0)
-        src_end = min(start + length, total_len)
-        if src_start < src_end:
-            dst_start = src_start - start
-            dst_end = dst_start + (src_end - src_start)
-            out[dst_start:dst_end] = self.full_data[src_start:src_end]
-        return out
+        return np.asarray(self.full_data[start:start + length], dtype=np.float32).copy()

@@ -723,8 +723,9 @@ class BaseEpochRunner(metaclass=ABCMeta):
         # perform testing if configured
         if self.test_data_loader is not None and epoch % self.test_interval == 0:
             self.test_pipeline(train_epoch=epoch)
-        # save the model checkpoint
-        self.save_model(epoch)
+        # per-epoch checkpoint save is skipped to reduce disk I/O.
+        # final test in on_training_end loads best_val_*.pt only,
+        # so per-epoch ckpts are unused.
         # reset epoch meters
         self.reset_epoch_meters()
 
@@ -922,6 +923,14 @@ class BaseEpochRunner(metaclass=ABCMeta):
             greater_best (bool, optional): `True` means greater value is best, such as `acc`
                 `False` means lower value is best, such as `loss`. Defaults to True.
         """
+
+        # Skip best-ckpt updates for early epochs to reduce disk I/O.
+        # Tracking is also skipped, so the first val at/after this epoch
+        # becomes the new "best" baseline.
+        # NOTE: if training stops before this threshold, no best_val ckpt
+        # will exist and on_training_end's final test will fail.
+        if epoch < 30:
+            return
 
         metric = self.meter_pool.get_value(metric_name)
         best_metric = self.best_metrics.get(metric_name)

@@ -1,3 +1,3 @@
-from .odmixer_arch import ODMixerAdapter, odmixer_loss
+from .odmixer_arch import ODMixerBackbone
 
-__all__ = ["ODMixerAdapter", "odmixer_loss"]
+__all__ = ["ODMixerBackbone"]

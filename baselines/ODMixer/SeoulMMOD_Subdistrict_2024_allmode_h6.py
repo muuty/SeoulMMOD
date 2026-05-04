@@ -9,9 +9,10 @@ sys.path.append(os.path.abspath(__file__ + "/../../.."))
 from basicts.data import ODMatrixDataset
 from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
-from basicts.scaler import ZScoreScaler
+from basicts.scaler import Log1pZScoreScaler
 
-from .arch import ODMixerAdapter, odmixer_loss
+from .adapter import ODMixerAdapter
+from .loss import odmixer_loss
 
 
 DATA_NAME = "SeoulMMOD_Subdistrict_2024"
@@ -20,6 +21,7 @@ OUTPUT_LEN = 6
 TRAIN_VAL_TEST_RATIO = [0.7, 0.1, 0.2]
 NUM_EPOCHS = 100
 BATCH_SIZE = 16
+PREV_PERIOD = 24
 
 MODEL_ARCH = ODMixerAdapter
 MODEL_PARAM = {
@@ -47,17 +49,19 @@ CFG.DATASET.PARAM = EasyDict({
     "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
     "memmap": True,
-    "prev_period": 24,
+    "prev_period": PREV_PERIOD,
 })
 
 CFG.SCALER = EasyDict()
-CFG.SCALER.TYPE = ZScoreScaler
+CFG.SCALER.TYPE = Log1pZScoreScaler
 CFG.SCALER.PARAM = EasyDict({
     "dataset_name": DATA_NAME,
     "train_ratio": TRAIN_VAL_TEST_RATIO[0],
     "norm_each_channel": False,
     "rescale": True,
     "target_channel": [0, 1, 2, 3, 4, 5],
+    "input_len": INPUT_LEN,
+    "output_len": OUTPUT_LEN,
 })
 
 CFG.MODEL = EasyDict()
@@ -66,6 +70,7 @@ CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
+CFG.MODEL.CLIP_PREDICTION = True
 
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({"MAE": masked_mae, "RMSE": masked_rmse, "wMAPE": unmasked_wmape})
@@ -74,7 +79,7 @@ CFG.METRICS.NULL_VAL = np.nan
 
 CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
-CFG.TRAIN.EARLY_STOPPING_PATIENCE = 100
+CFG.TRAIN.EARLY_STOPPING_PATIENCE = 10
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     "checkpoints",
     "ODMixer_allmode_2024",
@@ -95,7 +100,7 @@ CFG.VAL.DATA = EasyDict()
 CFG.VAL.DATA.BATCH_SIZE = BATCH_SIZE
 
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = 1
+CFG.TEST.INTERVAL = NUM_EPOCHS + 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = BATCH_SIZE
 
