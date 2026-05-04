@@ -36,8 +36,6 @@ class HistoricalAverage(nn.Module):
         with open(desc_path) as f:
             desc = json.load(f)
         T_total, N_pairs, F_total = tuple(desc['shape'])
-        if N_pairs != num_nodes:
-            raise ValueError(f'num_nodes mismatch: dataset N={N_pairs}, given {num_nodes}')
 
         flow = np.memmap(data_path, dtype='float32', mode='r',
                          shape=(T_total, N_pairs, F_total))
@@ -80,8 +78,6 @@ class HistoricalAverage(nn.Module):
         ha_norm = (ha_raw - means_arr) / stds_arr
         self.register_buffer('table', torch.from_numpy(ha_norm))
 
-        self.register_parameter('_unused', nn.Parameter(torch.zeros(1)))
-
     def forward(self, history_data: torch.Tensor, future_data: torch.Tensor,
                 batch_seen: int, epoch: int, train: bool, **kwargs) -> torch.Tensor:
         tod = future_data[:, :, 0, self.tod_index]
@@ -91,4 +87,4 @@ class HistoricalAverage(nn.Module):
         how = (dow_int * 24 + tod_int) % WEEK_HOURS
 
         pred = self.table[how]
-        return pred + 0.0 * self._unused.sum()
+        return pred

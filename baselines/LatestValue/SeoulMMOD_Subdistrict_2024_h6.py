@@ -7,8 +7,8 @@ from easydict import EasyDict
 sys.path.append(os.path.abspath(__file__ + '/../../..'))
 
 from basicts.data import TimeSeriesForecastingDataset
-from basicts.metrics import masked_mae, masked_rmse, unmasked_wape
-from basicts.runners import SimpleTimeSeriesForecastingRunner
+from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
+from basicts.runners import NoBPRunner
 from basicts.scaler import ZScoreScaler
 
 from .arch import LatestValue
@@ -24,7 +24,7 @@ NUM_EPOCHS = 1
 CFG = EasyDict()
 CFG.DESCRIPTION = f'LatestValue on {DATA_NAME} (input={INPUT_LEN}, output={OUTPUT_LEN})'
 CFG.GPU_NUM = 1
-CFG.RUNNER = SimpleTimeSeriesForecastingRunner
+CFG.RUNNER = NoBPRunner
 
 CFG.DATASET = EasyDict()
 CFG.DATASET.NAME = DATA_NAME
@@ -57,7 +57,7 @@ CFG.MODEL.FORWARD_FEATURES = list(range(NUM_MODES + 2))
 CFG.MODEL.TARGET_FEATURES = TARGET_CHANNEL
 
 CFG.METRICS = EasyDict()
-CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse, 'WAPE': unmasked_wape})
+CFG.METRICS.FUNCS = EasyDict({'MAE': masked_mae, 'RMSE': masked_rmse, 'wMAPE': unmasked_wmape})
 CFG.METRICS.TARGET = 'MAE'
 CFG.METRICS.NULL_VAL = np.nan
 
@@ -81,7 +81,7 @@ CFG.VAL.DATA = EasyDict()
 CFG.VAL.DATA.BATCH_SIZE = 16
 
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = 1
+CFG.TEST.INTERVAL = NUM_EPOCHS + 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = 16
 
