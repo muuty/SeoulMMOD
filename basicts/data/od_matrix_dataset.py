@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -11,6 +11,7 @@ class ODMatrixDataset(TimeSeriesForecastingDataset):
     def __init__(self, dataset_name: str, train_val_test_ratio: List[float],
                  mode: str, input_len: int, output_len: int,
                  memmap: bool = True, overlap: bool = False,
+                 prev_period: Optional[int] = None,
                  logger: logging.Logger = None) -> None:
         super().__init__(
             dataset_name=dataset_name,
@@ -28,6 +29,15 @@ class ODMatrixDataset(TimeSeriesForecastingDataset):
             raise ValueError(f"ODMatrixDataset requires square OD pairs, got {num_pairs}")
         self.num_od_nodes = num_od_nodes
         self.time_offset = self._time_offset()
+        self.prev_period = prev_period
+        self.full_data = None
+        if self.prev_period is not None:
+            self.full_data = np.memmap(
+                self.data_file_path,
+                dtype="float32",
+                mode="r",
+                shape=tuple(self.description["shape"]),
+            )
 
     def _time_offset(self) -> int:
         total_len = tuple(self.description["shape"])[0]
@@ -45,4 +55,21 @@ class ODMatrixDataset(TimeSeriesForecastingDataset):
     def __getitem__(self, index: int) -> dict:
         item = super().__getitem__(index)
         item["time_index"] = np.int64(self.time_offset + index + self.input_len - 1)
+        if self.prev_period is not None:
+            history_start = self.time_offset + index - self.prev_period
+            target_start = history_start + self.input_len
+            item["prev_inputs"] = self._full_slice(history_start, self.input_len)
+            item["prev_target"] = self._full_slice(target_start, self.output_len)
         return item
+
+    def _full_slice(self, start: int, length: int) -> np.ndarray:
+        shape = (length,) + tuple(self.description["shape"][1:])
+        out = np.zeros(shape, dtype=np.float32)
+        total_len = tuple(self.description["shape"])[0]
+        src_start = max(start, 0)
+        src_end = min(start + length, total_len)
+        if src_start < src_end:
+            dst_start = src_start - start
+            dst_end = dst_start + (src_end - src_start)
+            out[dst_start:dst_end] = self.full_data[src_start:src_end]
+        return out

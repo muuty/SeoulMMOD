@@ -132,7 +132,10 @@ class MPGCNCore(nn.Module):
                       use_bias=True, activation=nn.ReLU)
                 for _ in range(self.num_layers)
             ])
-            branch["fc"] = nn.Linear(hidden_dim, output_dim)
+            branch["fc"] = nn.Sequential(
+                nn.Linear(hidden_dim, output_dim),
+                nn.ReLU(),
+            )
             self.branches.append(branch)
 
     def _init_hidden(self, batch_size: int, device: torch.device):

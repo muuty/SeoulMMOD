@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../.."))
 from basicts.data import ODMatrixDataset
 from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
-from basicts.scaler import ZScoreScaler
+from basicts.scaler import Log1pScaler
 
 from .arch import MPGCNAdapter
 
@@ -52,7 +52,7 @@ CFG.DATASET.PARAM = EasyDict({
 })
 
 CFG.SCALER = EasyDict()
-CFG.SCALER.TYPE = ZScoreScaler
+CFG.SCALER.TYPE = Log1pScaler
 CFG.SCALER.PARAM = EasyDict({
     "dataset_name": DATA_NAME,
     "train_ratio": TRAIN_VAL_TEST_RATIO[0],
@@ -67,6 +67,7 @@ CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
+CFG.MODEL.TRAIN_VAL_HORIZON = 1
 
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({"MAE": masked_mae, "RMSE": masked_rmse, "wMAPE": unmasked_wmape})

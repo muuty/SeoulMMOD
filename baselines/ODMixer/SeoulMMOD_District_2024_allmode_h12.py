@@ -15,8 +15,8 @@ from .arch import ODMixerAdapter, odmixer_loss
 
 
 DATA_NAME = "SeoulMMOD_District_2024"
-INPUT_LEN = 24
-OUTPUT_LEN = 24
+INPUT_LEN = 12
+OUTPUT_LEN = 12
 TRAIN_VAL_TEST_RATIO = [0.7, 0.1, 0.2]
 NUM_EPOCHS = 100
 BATCH_SIZE = 16
@@ -34,7 +34,7 @@ MODEL_PARAM = {
 }
 
 CFG = EasyDict()
-CFG.DESCRIPTION = "ODMixer OD-native adapter on SeoulMMOD_District_2024, h=24"
+CFG.DESCRIPTION = "ODMixer OD-native adapter on SeoulMMOD_District_2024, h=12"
 CFG.GPU_NUM = 1
 CFG.RUNNER = ODNativeRunner
 

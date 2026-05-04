@@ -11,30 +11,30 @@ from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
 from basicts.scaler import ZScoreScaler
 
-from .arch import ODMixerAdapter, odmixer_loss
+from .arch import ODCRNAdapter
 
 
-DATA_NAME = "SeoulMMOD_District_2024"
-INPUT_LEN = 24
-OUTPUT_LEN = 24
+DATA_NAME = "SeoulMMOD_Subdistrict_2024"
+INPUT_LEN = 6
+OUTPUT_LEN = 6
 TRAIN_VAL_TEST_RATIO = [0.7, 0.1, 0.2]
 NUM_EPOCHS = 100
 BATCH_SIZE = 16
 
-MODEL_ARCH = ODMixerAdapter
+MODEL_ARCH = ODCRNAdapter
 MODEL_PARAM = {
-    "num_nodes": 25,
+    "num_nodes": 426,
     "input_dim": 6,
     "output_dim": 6,
-    "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
-    "hidden_dim": 16,
-    "layer_nums": 5,
-    "dropout": 0.1,
+    "hidden_dim": 32,
+    "K_cheby": 2,
+    "num_layers": 2,
+    "dgc": True,
 }
 
 CFG = EasyDict()
-CFG.DESCRIPTION = "ODMixer OD-native adapter on SeoulMMOD_District_2024, h=24"
+CFG.DESCRIPTION = "ODCRN OD-native adapter on SeoulMMOD_Subdistrict_2024, h=6"
 CFG.GPU_NUM = 1
 CFG.RUNNER = ODNativeRunner
 
@@ -47,7 +47,6 @@ CFG.DATASET.PARAM = EasyDict({
     "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
     "memmap": True,
-    "prev_period": 24,
 })
 
 CFG.SCALER = EasyDict()
@@ -74,13 +73,13 @@ CFG.METRICS.NULL_VAL = np.nan
 
 CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
-CFG.TRAIN.EARLY_STOPPING_PATIENCE = 100
+CFG.TRAIN.EARLY_STOPPING_PATIENCE = 10
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     "checkpoints",
-    "ODMixer_allmode_2024",
+    "ODCRN_allmode_2024",
     "_".join([DATA_NAME, str(NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)]),
 )
-CFG.TRAIN.LOSS = odmixer_loss
+CFG.TRAIN.LOSS = masked_mae
 CFG.TRAIN.OPTIM = EasyDict()
 CFG.TRAIN.OPTIM.TYPE = "Adam"
 CFG.TRAIN.OPTIM.PARAM = {"lr": 0.001}

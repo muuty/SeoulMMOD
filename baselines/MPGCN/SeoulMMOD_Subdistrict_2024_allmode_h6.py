@@ -9,32 +9,34 @@ sys.path.append(os.path.abspath(__file__ + "/../../.."))
 from basicts.data import ODMatrixDataset
 from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
-from basicts.scaler import ZScoreScaler
+from basicts.scaler import Log1pScaler
 
-from .arch import ODMixerAdapter, odmixer_loss
+from .arch import MPGCNAdapter
 
 
-DATA_NAME = "SeoulMMOD_District_2024"
-INPUT_LEN = 24
-OUTPUT_LEN = 24
+DATA_NAME = "SeoulMMOD_Subdistrict_2024"
+INPUT_LEN = 6
+OUTPUT_LEN = 6
 TRAIN_VAL_TEST_RATIO = [0.7, 0.1, 0.2]
 NUM_EPOCHS = 100
 BATCH_SIZE = 16
 
-MODEL_ARCH = ODMixerAdapter
+MODEL_ARCH = MPGCNAdapter
 MODEL_PARAM = {
-    "num_nodes": 25,
+    "num_nodes": 426,
     "input_dim": 6,
     "output_dim": 6,
-    "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
-    "hidden_dim": 16,
-    "layer_nums": 5,
-    "dropout": 0.1,
+    "hidden_dim": 32,
+    "K_cheby": 2,
+    "data_path": os.path.join("datasets", DATA_NAME, "data.dat"),
+    "desc_path": os.path.join("datasets", DATA_NAME, "desc.json"),
+    "train_ratio": TRAIN_VAL_TEST_RATIO[0],
+    "period": 24,
 }
 
 CFG = EasyDict()
-CFG.DESCRIPTION = "ODMixer OD-native adapter on SeoulMMOD_District_2024, h=24"
+CFG.DESCRIPTION = "MPGCN OD-native adapter on SeoulMMOD_Subdistrict_2024, h=6"
 CFG.GPU_NUM = 1
 CFG.RUNNER = ODNativeRunner
 
@@ -47,11 +49,10 @@ CFG.DATASET.PARAM = EasyDict({
     "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
     "memmap": True,
-    "prev_period": 24,
 })
 
 CFG.SCALER = EasyDict()
-CFG.SCALER.TYPE = ZScoreScaler
+CFG.SCALER.TYPE = Log1pScaler
 CFG.SCALER.PARAM = EasyDict({
     "dataset_name": DATA_NAME,
     "train_ratio": TRAIN_VAL_TEST_RATIO[0],
@@ -66,6 +67,7 @@ CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1, 2, 3, 4, 5]
 CFG.MODEL.TARGET_FEATURES = [0, 1, 2, 3, 4, 5]
+CFG.MODEL.TRAIN_VAL_HORIZON = 1
 
 CFG.METRICS = EasyDict()
 CFG.METRICS.FUNCS = EasyDict({"MAE": masked_mae, "RMSE": masked_rmse, "wMAPE": unmasked_wmape})
@@ -74,13 +76,13 @@ CFG.METRICS.NULL_VAL = np.nan
 
 CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
-CFG.TRAIN.EARLY_STOPPING_PATIENCE = 100
+CFG.TRAIN.EARLY_STOPPING_PATIENCE = 10
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     "checkpoints",
-    "ODMixer_allmode_2024",
+    "MPGCN_allmode_2024",
     "_".join([DATA_NAME, str(NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)]),
 )
-CFG.TRAIN.LOSS = odmixer_loss
+CFG.TRAIN.LOSS = masked_mae
 CFG.TRAIN.OPTIM = EasyDict()
 CFG.TRAIN.OPTIM.TYPE = "Adam"
 CFG.TRAIN.OPTIM.PARAM = {"lr": 0.001}
