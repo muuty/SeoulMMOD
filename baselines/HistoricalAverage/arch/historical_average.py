@@ -14,10 +14,8 @@ WEEK_HOURS = 168
 class HistoricalAverage(nn.Module):
     def __init__(
         self,
-        dataset_name: str,
         data_path: str,
         desc_path: str,
-        num_nodes: int,
         input_len: int,
         output_len: int,
         train_ratio: float = 0.7,
@@ -27,9 +25,6 @@ class HistoricalAverage(nn.Module):
         dow_index: int = 7,
     ) -> None:
         super().__init__()
-        self.num_nodes = num_nodes
-        self.num_modes = num_modes
-        self.output_len = output_len
         self.tod_index = tod_index
         self.dow_index = dow_index
 

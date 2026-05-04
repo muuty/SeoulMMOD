@@ -123,7 +123,7 @@ CFG.VAL.DATA.BATCH_SIZE = BATCH_SIZE
 
 ############################## Test Configuration ##############################
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = NUM_EPOCHS + 1
+CFG.TEST.INTERVAL = 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = BATCH_SIZE
 

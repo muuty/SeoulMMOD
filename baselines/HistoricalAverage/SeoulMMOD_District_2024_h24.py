@@ -50,10 +50,8 @@ CFG.MODEL = EasyDict()
 CFG.MODEL.NAME = 'HistoricalAverage'
 CFG.MODEL.ARCH = HistoricalAverage
 CFG.MODEL.PARAM = EasyDict({
-    'dataset_name': DATA_NAME,
     'data_path': os.path.join('datasets', DATA_NAME, 'data.dat'),
     'desc_path': os.path.join('datasets', DATA_NAME, 'desc.json'),
-    'num_nodes': 625,
     'input_len': INPUT_LEN,
     'output_len': OUTPUT_LEN,
     'train_ratio': TRAIN_VAL_TEST_RATIO[0],
@@ -90,7 +88,7 @@ CFG.VAL.DATA = EasyDict()
 CFG.VAL.DATA.BATCH_SIZE = 16
 
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = NUM_EPOCHS + 1
+CFG.TEST.INTERVAL = 1
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = 16
 
