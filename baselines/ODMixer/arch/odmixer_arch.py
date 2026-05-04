@@ -122,3 +122,50 @@ class ODMixerBackbone(nn.Module):
         od_out = self.output_layer(od_feat).permute(0, 3, 1, 2)
         prev_out = self.output_layer(prev_od_feat).permute(0, 3, 1, 2)
         return od_out, prev_out
+
+
+class ODMixerAdapter(nn.Module):
+    def __init__(
+        self,
+        num_nodes: int,
+        input_dim: int,
+        output_dim: int,
+        input_len: int,
+        output_len: int,
+        hidden_dim: int = 32,
+        layer_nums: int = 2,
+        dropout: float = 0.1,
+    ) -> None:
+        super().__init__()
+        if output_dim != input_dim:
+            raise ValueError("ODMixerAdapter autoregressive rollout requires output_dim == input_dim")
+        self.num_nodes = num_nodes
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.output_len = output_len
+        self.backbone = ODMixerBackbone(
+            num_nodes=num_nodes,
+            input_seq=input_len * input_dim,
+            hidden_dim=hidden_dim,
+            layer_nums=layer_nums,
+            dropout=dropout,
+            out_steps=output_dim,
+        )
+
+    def forward(self, history_data: torch.Tensor, future_data: torch.Tensor,
+                batch_seen: int, epoch: int, train: bool, **kwargs) -> torch.Tensor:
+        cur = history_data
+        preds = []
+        for _ in range(self.output_len):
+            batch_size, input_len, _, _, input_dim = cur.shape
+            od = cur.permute(0, 1, 4, 2, 3).reshape(
+                batch_size, input_len * input_dim, self.num_nodes, self.num_nodes
+            )
+            prev_od = torch.zeros_like(od)
+            od_out, _ = self.backbone(od, prev_od)
+            step = od_out.reshape(
+                batch_size, self.output_dim, self.num_nodes, self.num_nodes
+            ).permute(0, 2, 3, 1).unsqueeze(1)
+            preds.append(step)
+            cur = torch.cat([cur[:, 1:], step], dim=1)
+        return torch.cat(preds, dim=1).contiguous()

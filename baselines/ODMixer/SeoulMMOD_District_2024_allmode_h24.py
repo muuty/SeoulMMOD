@@ -11,7 +11,7 @@ from basicts.metrics import masked_mae, masked_rmse, unmasked_wmape
 from basicts.runners import ODNativeRunner
 from basicts.scaler import ZScoreScaler
 
-from baselines.ODNative.arch import MPGCNAdapter
+from .arch import ODMixerAdapter
 
 
 DATA_NAME = "SeoulMMOD_District_2024"
@@ -21,22 +21,20 @@ TRAIN_VAL_TEST_RATIO = [0.7, 0.1, 0.2]
 NUM_EPOCHS = 100
 BATCH_SIZE = 16
 
-MODEL_ARCH = MPGCNAdapter
+MODEL_ARCH = ODMixerAdapter
 MODEL_PARAM = {
     "num_nodes": 25,
     "input_dim": 6,
     "output_dim": 6,
+    "input_len": INPUT_LEN,
     "output_len": OUTPUT_LEN,
     "hidden_dim": 32,
-    "K_cheby": 2,
-    "data_path": os.path.join("datasets", DATA_NAME, "data.dat"),
-    "desc_path": os.path.join("datasets", DATA_NAME, "desc.json"),
-    "train_ratio": TRAIN_VAL_TEST_RATIO[0],
-    "period": 24,
+    "layer_nums": 2,
+    "dropout": 0.1,
 }
 
 CFG = EasyDict()
-CFG.DESCRIPTION = "MPGCN OD-native adapter on SeoulMMOD_District_2024, h=24"
+CFG.DESCRIPTION = "ODMixer OD-native adapter on SeoulMMOD_District_2024, h=24"
 CFG.GPU_NUM = 1
 CFG.RUNNER = ODNativeRunner
 
@@ -78,7 +76,7 @@ CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
 CFG.TRAIN.EARLY_STOPPING_PATIENCE = 10
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     "checkpoints",
-    "MPGCN_allmode_2024",
+    "ODMixer_allmode_2024",
     "_".join([DATA_NAME, str(NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)]),
 )
 CFG.TRAIN.LOSS = masked_mae
