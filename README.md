@@ -1,6 +1,6 @@
 # SeoulMMOD
 
-[Project page](https://muuty.github.io/SeoulMMOD/) · [Dataset](https://www.kaggle.com/datasets/muutyy/seoulmmod) · [Implementation details](https://muuty.github.io/SeoulMMOD/implementation.html)
+[Project page](https://muuty.github.io/SeoulMMOD/) · [Dataset](https://www.kaggle.com/datasets/muutyy/seoulmmod) · [Paper](https://muuty.github.io/SeoulMMOD/assets/SeoulMMOD-manuscript.pdf)
 
 This is the code repository for SeoulMMOD benchmark experiments. SeoulMMOD
 contains hourly multimodal origin-destination flows within Seoul from 2023 to
@@ -86,7 +86,7 @@ These scripts use optional files such as `calendar.csv`,
 
 ## OD baseline adaptations
 
-The [implementation guide](https://muuty.github.io/SeoulMMOD/implementation.html) explains what is preserved and changed in MPGCN, ODCRN, and ODMixer, why each adaptation is used, and where to find both the reference code and the released configurations. It covers multi-mode inputs, multi-horizon outputs, graph construction, scaling, and previous-day trend learning.
+Implementation changes to MPGCN, ODCRN, and ODMixer and their rationale are documented in Appendix C.2 of the [paper](https://muuty.github.io/SeoulMMOD/assets/SeoulMMOD-manuscript.pdf).
 
 ## Citation
 
