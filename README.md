@@ -73,6 +73,9 @@ python experiments/train.py \
 
 Use another config under `baselines/` for a different model.
 
+wMAPE is computed as `sum(|prediction - target|) / sum(|target|)` over the
+full evaluation set and stored as a fraction.
+
 ## Context
 
 ```bash

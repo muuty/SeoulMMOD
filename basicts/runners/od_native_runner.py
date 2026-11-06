@@ -157,12 +157,12 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
                 for metric_name, metric_func in self.metrics.items():
                     if metric_name.lower() == "mase":
                         continue
-                    metric_val = self.metric_forward(metric_func, {"prediction": pred_h, "target": target_h})
-                    self.update_epoch_meter(f"test/{metric_name}@h{i+1}", metric_val.item(), weight_h)
+                    self._update_metric(f"test/{metric_name}@h{i+1}", metric_func,
+                                        {"prediction": pred_h, "target": target_h}, weight_h)
 
             for metric_name, metric_func in self.metrics.items():
-                metric_item = self.metric_forward(metric_func, {"prediction": pred, "target": target})
-                self.update_epoch_meter(f"test/{metric_name}", metric_item.item(), weight)
+                self._update_metric(f"test/{metric_name}", metric_func,
+                                    {"prediction": pred, "target": target}, weight)
 
             for mode_idx, mode in enumerate(self.mode_names):
                 if mode_idx >= pred.shape[-1]:
@@ -171,8 +171,8 @@ class ODNativeRunner(SimpleTimeSeriesForecastingRunner):
                 target_m = target[..., mode_idx:mode_idx + 1]
                 weight_m = self._get_metric_weight(target_m)
                 for metric_name, metric_func in self.metrics.items():
-                    metric_item = self.metric_forward(metric_func, {"prediction": pred_m, "target": target_m})
-                    self.update_epoch_meter(f"test/{metric_name}@{mode}", metric_item.item(), weight_m)
+                    self._update_metric(f"test/{metric_name}@{mode}", metric_func,
+                                        {"prediction": pred_m, "target": target_m}, weight_m)
 
         if save_metrics:
             metrics_results = {

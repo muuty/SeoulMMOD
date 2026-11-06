@@ -9,7 +9,7 @@ from .r_square import masked_r2
 from .rmse import masked_rmse
 from .smape import masked_smape
 from .wape import masked_wape
-from .unmasked_wmape import unmasked_wmape
+from .unmasked_wmape import WMAPEMeter, unmasked_wmape
 
 ALL_METRICS = {
             'MAE': masked_mae,
@@ -27,6 +27,7 @@ ALL_METRICS = {
 
 METRIC_METER = {
     'RMSE': RMSEMeter,
+    'wMAPE': WMAPEMeter,
     'default': AvgMeter
 }
 

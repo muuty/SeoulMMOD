@@ -359,6 +359,14 @@ class BaseTimeSeriesForecastingRunner(BaseEpochRunner):
             raise TypeError(f'Unknown metric type: {type(metric_func)}')
         return metric_item
 
+    @torch.no_grad()
+    def _update_metric(self, name, metric_func, args, weight):
+        if name.split('/')[1].split('@')[0] == 'wMAPE':
+            self.update_epoch_meter(name, args['prediction'], args['target'])
+        else:
+            value = self.metric_forward(metric_func, args)
+            self.update_epoch_meter(name, value.item(), weight)
+
     def train_iters(self, epoch: int, iter_index: int, data: Union[torch.Tensor, Tuple]) -> torch.Tensor:
         """Training iteration process.
 
@@ -384,8 +392,7 @@ class BaseTimeSeriesForecastingRunner(BaseEpochRunner):
         self.update_epoch_meter('train/loss', loss.item(), weight)
 
         for metric_name, metric_func in self.metrics.items():
-            metric_item = self.metric_forward(metric_func, forward_return)
-            self.update_epoch_meter(f'train/{metric_name}', metric_item.item(), weight)
+            self._update_metric(f'train/{metric_name}', metric_func, forward_return, weight)
         return loss
 
     def val_iters(self, iter_index: int, data: Union[torch.Tensor, Tuple]):
@@ -402,8 +409,7 @@ class BaseTimeSeriesForecastingRunner(BaseEpochRunner):
         self.update_epoch_meter('val/loss', loss.item(), weight)
 
         for metric_name, metric_func in self.metrics.items():
-            metric_item = self.metric_forward(metric_func, forward_return)
-            self.update_epoch_meter(f'val/{metric_name}', metric_item.item(), weight)
+            self._update_metric(f'val/{metric_name}', metric_func, forward_return, weight)
 
     @torch.no_grad()
     @master_only
@@ -446,12 +452,12 @@ class BaseTimeSeriesForecastingRunner(BaseEpochRunner):
                 for metric_name, metric_func in self.metrics.items():
                     if metric_name.lower() == 'mase':
                         continue  # MASE needs to be calculated after all horizons
-                    metric_val = self.metric_forward(metric_func, {'prediction': pred_h, 'target': target_h})
-                    self.update_epoch_meter(f'test/{metric_name}@h{i+1}', metric_val.item(), weight_h)
+                    self._update_metric(f'test/{metric_name}@h{i+1}', metric_func,
+                                        {'prediction': pred_h, 'target': target_h}, weight_h)
 
             for metric_name, metric_func in self.metrics.items():
-                metric_item = self.metric_forward(metric_func, {'prediction': pred, 'target': target})
-                self.update_epoch_meter(f'test/{metric_name}', metric_item.item(), weight)
+                self._update_metric(f'test/{metric_name}', metric_func,
+                                    {'prediction': pred, 'target': target}, weight)
 
         if save_metrics:
             metrics_results = {}
