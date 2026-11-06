@@ -44,7 +44,7 @@ video galleries, leaderboards, and decorative elements were not copied.
 - Table captions: `writing/sections/experiments.tex`.
 - PDF: current camera-ready manuscript, including Appendix C.2 implementation
   details. SHA-256:
-  `ef4e03b85de66d21475d6524e9a9445dfcd95e61ce404dcf7fec00228883b933`.
+  `5e36617c6f014022900e38d6ffbc33660fb98366432f090d6dad85c0d2aed86c`.
 
 Tables reproduce the manuscript's reported values; this website revision does
 not recompute metrics or modify the benchmark runner. New experiment results
