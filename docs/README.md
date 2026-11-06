@@ -44,7 +44,7 @@ video galleries, leaderboards, and decorative elements were not copied.
 - Table captions: `writing/sections/experiments.tex`.
 - PDF: current camera-ready manuscript, including Appendix C.2 implementation
   details. SHA-256:
-  `8602e7904e8197bcf9e3bf07a0d84b6ca493e386193997091f42f766e1985fea`.
+  `d3f5e851ee29368498b2dc045ad371fa0493066db8836294c798db20cfaa3c94`.
 
 Tables reproduce the manuscript's reported values; this website revision does
 not recompute metrics or modify the benchmark runner. New experiment results
@@ -80,3 +80,25 @@ The PDF and figure are byte-identical to the manuscript files. Chromium checks
 passed with JavaScript disabled at 1440, 1024, 390, and 320 px, without page-level
 horizontal overflow or failed requests. Desktop, mobile, main-table, and
 cross-year screenshots were visually inspected; table keyboard scrolling passed.
+
+## OSM animation preview
+
+[36-second MP4](https://muuty.github.io/SeoulMMOD/assets/multimode-traffic.mp4)
+with a [poster](assets/multimode-traffic-poster.png) and
+[displayed data and provenance](assets/multimode-traffic-data.json).
+
+One map shows all six modes using the paper's mode colors. The animation
+uses hourly mean flows across all 262 Monday–Friday dates in 2024, including
+public holidays. For readability, each mode shows its 12 largest directed
+inter-district OD pairs, ranked by mean flow over those dates; the selected
+pairs stay fixed for the entire cycle. Within-district flows are excluded.
+Line width follows the square root of flow on one common scale across all
+modes and hours. Transitions interpolate consecutive hourly means. Two moving
+markers per connection indicate direction, not traveler counts or speeds.
+Curves connect district centers and are not reconstructed travel routes.
+
+The background uses a single cached OpenStreetMap vector extract from Overpass,
+with attribution in every frame. OSM map data is licensed under ODbL 1.0;
+SeoulMMOD flow data retains its CC BY-NC 4.0 license. Source selection, timestamp,
+flow coverage by mode, source-data hash, and display encodings are recorded in
+the JSON. This preview is available as an asset; the paper-page layout is unchanged.
