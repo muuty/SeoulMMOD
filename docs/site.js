@@ -66,4 +66,3 @@ document.querySelector("#copy-citation").addEventListener("click",async()=>{
 });
 renderBenchmark(); renderSparsity();
 })();
-

@@ -37,6 +37,12 @@ for presentation patterns:
 
 ## Verification
 
+Chromium checks passed on 2026-11-06: all six scale/horizon combinations,
+three sparsity slices, citation copying, both HTML pages and assets, internal
+anchors, and 390 px mobile layout. Desktop and mobile screenshots were also
+visually inspected. Source links, JSON/JS data agreement, and PDF synchronization
+were checked separately. The manuscript has 10 content pages and 27 pages total.
+
 Validate both pages, internal anchors, local assets, result-data consistency,
 all six scale/horizon states, all three sparsity slices, citation copying,
 and desktop/mobile layout before publishing changes. Site JS is buildless.
