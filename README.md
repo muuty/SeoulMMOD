@@ -1,5 +1,7 @@
 # SeoulMMOD
 
+[Project page](https://muuty.github.io/SeoulMMOD/) · [Dataset](https://www.kaggle.com/datasets/muutyy/seoulmmod) · [Paper](https://muuty.github.io/SeoulMMOD/assets/SeoulMMOD-manuscript.pdf)
+
 This is the code repository for SeoulMMOD benchmark experiments. SeoulMMOD
 contains hourly multimodal origin-destination flows within Seoul from 2023 to
 2025. It covers six urban transport modes at district and subdistrict scales,
@@ -81,6 +83,10 @@ python scripts/build_district_rain_dataset.py --year 2024
 These scripts use optional files such as `calendar.csv`,
 `district_poi.csv`, `district_metadata.csv`, and rainfall CSVs under
 `datasets/`.
+
+## OD baseline adaptations
+
+Implementation changes to MPGCN, ODCRN, and ODMixer and their rationale are documented in Appendix C.2 of the [paper](https://muuty.github.io/SeoulMMOD/assets/SeoulMMOD-manuscript.pdf).
 
 ## Citation
 

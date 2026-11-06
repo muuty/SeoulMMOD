@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeoulMMOD: A Large-Scale Multimodal Origin–Destination Flow Benchmark</title>
+  <meta name="description" content="SeoulMMOD: A Large-Scale Multimodal Origin–Destination Flow Benchmark. NeurIPS 2026, Evaluations and Datasets Track.">
+  <link rel="canonical" href="https://muuty.github.io/SeoulMMOD/">
+  <meta property="og:title" content="SeoulMMOD: A Large-Scale Multimodal Origin–Destination Flow Benchmark">
+  <meta property="og:image" content="https://muuty.github.io/SeoulMMOD/assets/od-flows.png">
+  <meta property="og:url" content="https://muuty.github.io/SeoulMMOD/">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans%7CNoto+Sans%7CCastoro" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop has-text-centered">
+        <h1 class="title is-1 is-size-2-mobile publication-title">SeoulMMOD: A Large-Scale Multimodal Origin–Destination Flow Benchmark</h1>
+        <div class="is-size-5 publication-authors">
+          <span class="author-block">Taeyoung Yu<sup>1</sup>,</span>
+          <span class="author-block">Seonbin Jo<sup>2</sup>,</span>
+          <span class="author-block">Jiwon Kim<sup>1</sup>,</span>
+          <span class="author-block">Junyoung Byun<sup>3</sup></span>
+        </div>
+        <div class="is-size-5 publication-authors">
+          <span class="author-block"><sup>1</sup>The University of Queensland,</span>
+          <span class="author-block"><sup>2</sup>POSTECH,</span>
+          <span class="author-block"><sup>3</sup>Chung-Ang University</span>
+        </div>
+        <p class="is-size-5 mt-3">NeurIPS 2026 · Evaluations and Datasets Track</p>
+        <div class="publication-links mt-3">
+          <span class="link-block"><a class="button is-dark is-rounded" href="assets/SeoulMMOD-manuscript.pdf">Paper</a></span>
+          <span class="link-block"><a class="button is-dark is-rounded" href="https://github.com/muuty/SeoulMMOD">Code</a></span>
+          <span class="link-block"><a class="button is-dark is-rounded" href="https://www.kaggle.com/datasets/muutyy/seoulmmod">Dataset</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <figure>
+          <img src="assets/od-flows.png" width="2887" height="1119" alt="2024 OD outflow from the same Seoul origin, shown at district and sub-district scales with destinations colored by dominant transport mode.">
+          <figcaption class="has-text-centered mt-3">Annual OD outflow in SeoulMMOD (2024) from the same Seoul origin at district and sub-district levels. Arc color indicates the destination's dominant transport mode.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="abstract">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Abstract</h2>
+      <div class="content"><p>Origin-destination (OD) flow forecasting supports urban mobility decisions by predicting the volume and patterns of human movement across a city. Most existing public OD benchmarks provide only a partial view of citywide mobility, covering a single transport service or at most two modes. With partial mode coverage, observed demand changes are difficult to separate into shifts across transport modes and changes in total travel. We introduce SeoulMMOD, a large-scale public benchmark for citywide multimodal mobility in Seoul. SeoulMMOD provides three years of hourly OD flows estimating total mobility for 6 urban travel modes across 25 districts and 426 sub-districts, together with travel-time, travel-distance, calendar, rainfall, and point-of-interest (POI) signals. Using SeoulMMOD, we benchmark 14 forecasting baselines under a common protocol and analyse the effects of spatial scaling, multi-mode versus single-mode inputs, and out-of-distribution (OOD) generalization. Results show that several spatio-temporal models that work at district level do not scale to sub-district OD forecasting. Multi-mode inputs improve single-mode forecasts, but predicting all modes with one model increases error. Together, the dataset and benchmark establish a reproducible testbed for multi-mode, multi-year OD forecasting at the city scale.<br>
+<a href="https://muuty.github.io/SeoulMMOD/">https://muuty.github.io/SeoulMMOD/</a></p></div>
+    </div>
+  </section>
+
+  <section class="section" id="benchmark">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Multi-Horizon Performance</h2>
+      <p id="main-results-caption" class="mb-5"><strong>Table 2.</strong> Multi-horizon performance and computational cost, aggregated across all six modes. Each learned baseline uses all six modes as inputs and outputs. Bold marks the best and underline marks the second-best per (horizon, metric) within each level. Cost columns report parameter count, batch size, per-epoch wall-clock, and 100-epoch wall-clock estimates at the 24h→24h horizon.</p>
+      <div class="table-container" tabindex="0" role="region" aria-label="Table 2: all horizons and both spatial scales">
+        <table id="main-results" class="table is-fullwidth is-narrow is-size-7" aria-describedby="main-results-caption">
+        <thead>
+          <tr><th></th><th colspan="3" scope="colgroup" class="has-text-centered">6h→6h</th><th colspan="3" scope="colgroup" class="has-text-centered">12h→12h</th><th colspan="3" scope="colgroup" class="has-text-centered">24h→24h</th><th colspan="4" scope="colgroup" class="has-text-centered">Cost (24h)</th></tr>
+          <tr><th scope="col">Model</th><th scope="col" class="has-text-right">MAE</th><th scope="col" class="has-text-right">RMSE</th><th scope="col" class="has-text-right">wMAPE</th><th scope="col" class="has-text-right">MAE</th><th scope="col" class="has-text-right">RMSE</th><th scope="col" class="has-text-right">wMAPE</th><th scope="col" class="has-text-right">MAE</th><th scope="col" class="has-text-right">RMSE</th><th scope="col" class="has-text-right">wMAPE</th><th scope="col" class="has-text-right">#Params</th><th scope="col" class="has-text-right">BS</th><th scope="col" class="has-text-right">Train/ep</th><th scope="col" class="has-text-right">Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><th colspan="14" scope="rowgroup"><em>District scale (625 OD pairs)</em></th></tr>
+          <tr data-scale="district"><th scope="row">HA</th><td class="has-text-right">22.9</td><td class="has-text-right">112.2</td><td class="has-text-right">10.5%</td><td class="has-text-right"><u>22.9</u></td><td class="has-text-right">112.2</td><td class="has-text-right"><u>10.5%</u></td><td class="has-text-right"><u>22.8</u></td><td class="has-text-right">111.8</td><td class="has-text-right"><u>10.5%</u></td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td></tr>
+          <tr data-scale="district"><th scope="row">LV</th><td class="has-text-right">106.6</td><td class="has-text-right">566.8</td><td class="has-text-right">49.0%</td><td class="has-text-right">144.2</td><td class="has-text-right">692.3</td><td class="has-text-right">66.3%</td><td class="has-text-right">139.0</td><td class="has-text-right">678.8</td><td class="has-text-right">63.9%</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td></tr>
+          <tr data-scale="district"><th scope="row">STAEformer</th><td class="has-text-right"><strong>21.8</strong></td><td class="has-text-right"><strong>93.7</strong></td><td class="has-text-right"><strong>10.1%</strong></td><td class="has-text-right"><strong>22.8</strong></td><td class="has-text-right"><strong>100.1</strong></td><td class="has-text-right"><strong>10.5%</strong></td><td class="has-text-right"><strong>21.4</strong></td><td class="has-text-right"><strong>92.9</strong></td><td class="has-text-right"><strong>9.8%</strong></td><td class="has-text-right">2.8M</td><td class="has-text-right">8</td><td class="has-text-right">83s</td><td class="has-text-right">2.3h</td></tr>
+          <tr data-scale="district"><th scope="row">STID</th><td class="has-text-right">23.4</td><td class="has-text-right">99.7</td><td class="has-text-right">10.8%</td><td class="has-text-right">25.1</td><td class="has-text-right">106.9</td><td class="has-text-right">11.5%</td><td class="has-text-right">24.6</td><td class="has-text-right"><u>111.7</u></td><td class="has-text-right">11.3%</td><td class="has-text-right">143K</td><td class="has-text-right">16</td><td class="has-text-right">3.2s</td><td class="has-text-right">0.09h</td></tr>
+          <tr data-scale="district"><th scope="row">AGCRN</th><td class="has-text-right"><u>22.7</u></td><td class="has-text-right">102.6</td><td class="has-text-right"><u>10.4%</u></td><td class="has-text-right">25.2</td><td class="has-text-right">111.2</td><td class="has-text-right">11.6%</td><td class="has-text-right">30.4</td><td class="has-text-right">178.9</td><td class="has-text-right">14.0%</td><td class="has-text-right">780K</td><td class="has-text-right">32</td><td class="has-text-right">21s</td><td class="has-text-right">0.57h</td></tr>
+          <tr data-scale="district"><th scope="row">GWNet</th><td class="has-text-right">23.8</td><td class="has-text-right"><u>95.9</u></td><td class="has-text-right">10.9%</td><td class="has-text-right">26.2</td><td class="has-text-right"><u>106.8</u></td><td class="has-text-right">12.1%</td><td class="has-text-right">27.6</td><td class="has-text-right">118.8</td><td class="has-text-right">12.7%</td><td class="has-text-right">353K</td><td class="has-text-right">32</td><td class="has-text-right">31s</td><td class="has-text-right">0.86h</td></tr>
+          <tr data-scale="district"><th scope="row">MTGNN</th><td class="has-text-right">23.8</td><td class="has-text-right">101.9</td><td class="has-text-right">11.0%</td><td class="has-text-right">26.7</td><td class="has-text-right">112.4</td><td class="has-text-right">12.3%</td><td class="has-text-right">27.4</td><td class="has-text-right">120.1</td><td class="has-text-right">12.6%</td><td class="has-text-right">1.7M</td><td class="has-text-right">32</td><td class="has-text-right">14s</td><td class="has-text-right">0.38h</td></tr>
+          <tr data-scale="district"><th scope="row">iTransformer</th><td class="has-text-right">56.7</td><td class="has-text-right">253.8</td><td class="has-text-right">26.1%</td><td class="has-text-right">38.7</td><td class="has-text-right">162.8</td><td class="has-text-right">17.8%</td><td class="has-text-right">25.3</td><td class="has-text-right">119.3</td><td class="has-text-right">11.7%</td><td class="has-text-right">4.8M</td><td class="has-text-right">256</td><td class="has-text-right">160s</td><td class="has-text-right">4.4h</td></tr>
+          <tr data-scale="district"><th scope="row">SOFTS</th><td class="has-text-right">58.4</td><td class="has-text-right">266.3</td><td class="has-text-right">26.9%</td><td class="has-text-right">42.6</td><td class="has-text-right">180.6</td><td class="has-text-right">19.6%</td><td class="has-text-right">26.5</td><td class="has-text-right">130.1</td><td class="has-text-right">12.2%</td><td class="has-text-right">205K</td><td class="has-text-right">256</td><td class="has-text-right">145s</td><td class="has-text-right">4.0h</td></tr>
+          <tr data-scale="district"><th scope="row">MTSMixer</th><td class="has-text-right">67.8</td><td class="has-text-right">329.1</td><td class="has-text-right">31.2%</td><td class="has-text-right">51.5</td><td class="has-text-right">243.8</td><td class="has-text-right">23.7%</td><td class="has-text-right">31.9</td><td class="has-text-right">172.7</td><td class="has-text-right">14.7%</td><td class="has-text-right">14K</td><td class="has-text-right">256</td><td class="has-text-right">118s</td><td class="has-text-right">3.3h</td></tr>
+          <tr data-scale="district"><th scope="row">TimeMixer</th><td class="has-text-right">56.1</td><td class="has-text-right">265.7</td><td class="has-text-right">25.9%</td><td class="has-text-right">51.3</td><td class="has-text-right">253.2</td><td class="has-text-right">23.6%</td><td class="has-text-right">31.6</td><td class="has-text-right">173.0</td><td class="has-text-right">14.5%</td><td class="has-text-right">16K</td><td class="has-text-right">256</td><td class="has-text-right">492s</td><td class="has-text-right">13.7h</td></tr>
+          <tr data-scale="district"><th scope="row">ODCRN</th><td class="has-text-right">27.8</td><td class="has-text-right">192.6</td><td class="has-text-right">12.8%</td><td class="has-text-right">31.8</td><td class="has-text-right">226.3</td><td class="has-text-right">14.7%</td><td class="has-text-right">30.2</td><td class="has-text-right">226.6</td><td class="has-text-right">13.9%</td><td class="has-text-right">178K</td><td class="has-text-right">16</td><td class="has-text-right">233s</td><td class="has-text-right">6.5h</td></tr>
+          <tr data-scale="district"><th scope="row">MPGCN</th><td class="has-text-right">34.9</td><td class="has-text-right">232.8</td><td class="has-text-right">16.1%</td><td class="has-text-right">40.5</td><td class="has-text-right">276.7</td><td class="has-text-right">18.7%</td><td class="has-text-right">43.0</td><td class="has-text-right">299.2</td><td class="has-text-right">19.8%</td><td class="has-text-right">75K</td><td class="has-text-right">16</td><td class="has-text-right">14s</td><td class="has-text-right">0.39h</td></tr>
+          <tr data-scale="district"><th scope="row">ODMixer</th><td class="has-text-right">31.2</td><td class="has-text-right">238.7</td><td class="has-text-right">14.4%</td><td class="has-text-right">37.8</td><td class="has-text-right">269.2</td><td class="has-text-right">17.4%</td><td class="has-text-right">51.9</td><td class="has-text-right">378.0</td><td class="has-text-right">23.9%</td><td class="has-text-right">206K</td><td class="has-text-right">16</td><td class="has-text-right">6.8s</td><td class="has-text-right">0.19h</td></tr>
+        </tbody>
+        <tbody>
+          <tr><th colspan="14" scope="rowgroup"><em>Sub-district scale (181,476 OD pairs); trained for up to 100 epochs with early-stopping (patience 10)</em></th></tr>
+          <tr data-scale="subdistrict"><th scope="row">HA</th><td class="has-text-right">0.475</td><td class="has-text-right"><strong>2.81</strong></td><td class="has-text-right">63.5%</td><td class="has-text-right">0.475</td><td class="has-text-right"><strong>2.81</strong></td><td class="has-text-right">63.5%</td><td class="has-text-right">0.475</td><td class="has-text-right"><strong>2.80</strong></td><td class="has-text-right">63.5%</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">LV</th><td class="has-text-right">0.742</td><td class="has-text-right">9.41</td><td class="has-text-right">99.1%</td><td class="has-text-right">0.833</td><td class="has-text-right">11.0</td><td class="has-text-right">111.2%</td><td class="has-text-right">0.820</td><td class="has-text-right">10.9</td><td class="has-text-right">109.6%</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">STAEformer</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">350.0M</td><td class="has-text-right">8</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">STID</th><td class="has-text-right"><u>0.434</u></td><td class="has-text-right"><u>5.20</u></td><td class="has-text-right"><u>58.4%</u></td><td class="has-text-right"><u>0.448</u></td><td class="has-text-right">5.79</td><td class="has-text-right"><u>60.2%</u></td><td class="has-text-right"><strong>0.442</strong></td><td class="has-text-right"><u>4.81</u></td><td class="has-text-right"><strong>59.2%</strong></td><td class="has-text-right">5.9M</td><td class="has-text-right">16</td><td class="has-text-right">1820s</td><td class="has-text-right">50.5h</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">AGCRN</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">2.6M</td><td class="has-text-right">32</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">GWNet</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">4.0M</td><td class="has-text-right">32</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">MTGNN</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">432.8M</td><td class="has-text-right">32</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">iTransformer</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">4.8M</td><td class="has-text-right">256</td><td class="has-text-right">TE</td><td class="has-text-right">TE</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">SOFTS</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">205K</td><td class="has-text-right">256</td><td class="has-text-right">TE</td><td class="has-text-right">TE</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">MTSMixer</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">14K</td><td class="has-text-right">256</td><td class="has-text-right">TE</td><td class="has-text-right">TE</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">TimeMixer</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">16K</td><td class="has-text-right">256</td><td class="has-text-right">TE</td><td class="has-text-right">TE</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">ODCRN</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">540K</td><td class="has-text-right">16</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">MPGCN</th><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">—</td><td class="has-text-right">75K</td><td class="has-text-right">16</td><td class="has-text-right">OOM</td><td class="has-text-right">OOM</td></tr>
+          <tr data-scale="subdistrict"><th scope="row">ODMixer</th><td class="has-text-right"><strong>0.423</strong></td><td class="has-text-right">5.21</td><td class="has-text-right"><strong>56.6%</strong></td><td class="has-text-right"><strong>0.434</strong></td><td class="has-text-right"><u>5.54</u></td><td class="has-text-right"><strong>58.1%</strong></td><td class="has-text-right">0.485</td><td class="has-text-right">6.96</td><td class="has-text-right">64.9%</td><td class="has-text-right">46.7M</td><td class="has-text-right">16</td><td class="has-text-right">540s</td><td class="has-text-right">15.0h</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="inputs">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Multi-Mode vs Single-Mode Inputs</h2>
+      <p id="multi-mode-results-caption" class="mb-5"><strong>Table 4.</strong> Multi-mode input/output comparison: average MAE across six modes, district 24h horizon. Single-target settings train six models (one per target). Bold marks the lowest MAE; — denotes not evaluated.</p>
+      <div class="table-container" tabindex="0" role="region" aria-label="multi mode results">
+        <table id="multi-mode-results" class="table is-fullwidth" aria-describedby="multi-mode-results-caption">
+        <thead><tr><th scope="col">Flow inputs</th><th scope="col">Flow outputs</th><th scope="col" class="has-text-right">Number of models</th><th scope="col" class="has-text-right">STID</th><th scope="col" class="has-text-right">STAEformer</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Target mode</th><td>Target mode</td><td class="has-text-right">6</td><td class="has-text-right">20.338</td><td class="has-text-right">20.205</td></tr>
+          <tr><th scope="row">All six modes</th><td>Target mode</td><td class="has-text-right">6</td><td class="has-text-right"><strong>20.241</strong></td><td class="has-text-right"><strong>19.494</strong></td></tr>
+          <tr><th scope="row">All six modes</th><td>All six modes</td><td class="has-text-right">1</td><td class="has-text-right">24.628</td><td class="has-text-right">21.367</td></tr>
+          <tr><th scope="row">Other five modes</th><td>Target mode</td><td class="has-text-right">6</td><td class="has-text-right">22.329</td><td class="has-text-right">—</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="generalization">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">OOD Generalization</h2>
+      <p id="cross-year-results-caption" class="mb-5"><strong>Table 5.</strong> OOD generalization at the district 24h horizon (2024 training split, full 2025 evaluation), broken down by season. Bold marks the easiest season per model. Δ% is the MAE change from the 2024 test split to the full 2025 calendar.</p>
+      <div class="table-container" tabindex="0" role="region" aria-label="OOD generalization results">
+        <table id="cross-year-results" class="table is-fullwidth" aria-describedby="cross-year-results-caption">
+        <thead><tr><th scope="col">Model</th><th scope="col" class="has-text-right">2024 test</th><th scope="col" class="has-text-right">2025 overall</th><th scope="col" class="has-text-right">Spring</th><th scope="col" class="has-text-right">Summer</th><th scope="col" class="has-text-right">Fall</th><th scope="col" class="has-text-right">Winter</th><th scope="col" class="has-text-right">Δ</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">STAEformer</th><td class="has-text-right">21.37</td><td class="has-text-right">25.83</td><td class="has-text-right">28.29</td><td class="has-text-right"><strong>23.70</strong></td><td class="has-text-right">25.75</td><td class="has-text-right">25.56</td><td class="has-text-right">+20.89%</td></tr>
+          <tr><th scope="row">AGCRN</th><td class="has-text-right">30.37</td><td class="has-text-right">35.77</td><td class="has-text-right">37.33</td><td class="has-text-right"><strong>32.84</strong></td><td class="has-text-right">36.93</td><td class="has-text-right">36.00</td><td class="has-text-right">+17.78%</td></tr>
+          <tr><th scope="row">GWNet</th><td class="has-text-right">27.55</td><td class="has-text-right">33.47</td><td class="has-text-right">35.21</td><td class="has-text-right"><strong>30.60</strong></td><td class="has-text-right">33.84</td><td class="has-text-right">34.29</td><td class="has-text-right">+21.49%</td></tr>
+          <tr><th scope="row">MTGNN</th><td class="has-text-right">27.40</td><td class="has-text-right">32.35</td><td class="has-text-right">34.63</td><td class="has-text-right"><strong>29.95</strong></td><td class="has-text-right">31.93</td><td class="has-text-right">32.89</td><td class="has-text-right">+18.07%</td></tr>
+          <tr><th scope="row">iTransformer</th><td class="has-text-right">25.33</td><td class="has-text-right">28.08</td><td class="has-text-right">29.87</td><td class="has-text-right"><strong>26.65</strong></td><td class="has-text-right">28.35</td><td class="has-text-right">27.42</td><td class="has-text-right">+10.86%</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="citation">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3">BibTeX</h2>
+      <pre><code>@inproceedings{yu2026seoulmmod,
+  title={SeoulMMOD: A Large-Scale Multimodal Origin-Destination Flow Benchmark},
+  author={Yu, Taeyoung and Jo, Seonbin and Kim, Jiwon and Byun, Junyoung},
+  booktitle={Advances in Neural Information Processing Systems,
+             Evaluations and Datasets Track},
+  year={2026}
+}</code></pre>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="container is-max-desktop has-text-centered">
+    <p>Website template adapted from <a href="https://nerfies.github.io/">Nerfies</a> under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+  </div>
+</footer>
+</body>
+</html>
